@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a5f">
+<title>수면일기</title>
+
+<!-- 홈 화면에 설치해서 앱처럼 쓰기 위한 것들.
+     홈 화면에 뜨는 이름은 manifest의 short_name('수면일기')이다. -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="수면일기">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- 검색 결과에 올라가지 않게 한다 -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- 카톡으로 링크를 보내면 대화창에 미리보기 카드가 뜬다.
+     정해두지 않으면 카톡이 페이지에서 아무 그림이나 골라 간다.
+     주소가 절대주소인 이유: 카톡 서버가 밖에서 읽어가므로 상대주소는 못 찾는다. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="수면일기">
+<meta property="og:title" content="수면일기">
+<meta property="og:description" content="매일 아침, 어젯밤 잠을 기록하세요">
+<meta property="og:url" content="https://hjfly1004-cmyk.github.io/sleep-diary-app/">
+<meta property="og:image" content="https://hjfly1004-cmyk.github.io/sleep-diary-app/icons/icon-512.png">
+<style>
+  :root{
+    --ink:#1a2332;
+    --ink-soft:#5a6675;
+    --ink-faint:#9aa4b2;
+    --line:#e3e7ec;
+    --line-soft:#eef1f4;
+    --paper:#ffffff;
+    --canvas:#f5f7fa;
+    --night:#1e3a5f;
+    --night-2:#2c5282;
+    --sleep:#3b6db5;
+    --sleep-soft:#dbe6f5;
+    --awake:#e08a5c;
+    --nap:#9b8fd4;
+    --good:#2f9e75;
+    --mid:#c9911a;
+    --bad:#d8643c;
+    --good-bg:#e3f3ec;
+    --mid-bg:#faf2dd;
+    --bad-bg:#fae8e1;
+    --radius:14px;
+    --radius-sm:9px;
+    --shadow:0 1px 3px rgba(26,35,50,0.06), 0 1px 2px rgba(26,35,50,0.04);
+    --shadow-lift:0 4px 16px rgba(26,35,50,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+    background:var(--canvas);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px 60px;}
+
+  /* Header */
+  header{
+    background:linear-gradient(160deg,var(--night) 0%,var(--night-2) 100%);
+    color:#fff;
+    padding:calc(env(safe-area-inset-top) + 28px) 24px 26px;
+    border-radius:0 0 24px 24px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header .stars{position:absolute;inset:0;opacity:0.5;pointer-events:none;}
+  header .stars span{position:absolute;background:#fff;border-radius:50%;animation:tw 4s infinite ease-in-out;}
+  @keyframes tw{0%,100%{opacity:0.25;}50%{opacity:0.9;}}
+  header h1{font-size:23px;font-weight:600;letter-spacing:-0.3px;display:flex;align-items:center;gap:10px;position:relative;}
+  header h1 .moon{
+    width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 65% 35%,#fdf6e3,#f0e6c8);
+    box-shadow:inset -6px -3px 0 rgba(0,0,0,0.08);
+    flex-shrink:0;
+  }
+  header p{font-size:13.5px;opacity:0.82;margin-top:7px;position:relative;font-weight:300;}
+  header .brand{font-size:11px;opacity:0.62;margin-top:13px;position:relative;font-weight:400;letter-spacing:0.2px;padding-top:11px;border-top:0.5px solid rgba(255,255,255,0.18);}
+
+  /* Mode tabs */
+  .modes{display:flex;gap:6px;background:var(--line-soft);padding:5px;border-radius:12px;margin-bottom:20px;}
+  .modes button{
+    flex:1;border:none;background:transparent;padding:11px 8px;border-radius:8px;
+    font-size:14px;font-weight:500;color:var(--ink-soft);cursor:pointer;font-family:inherit;
+    transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .modes button.active{background:var(--paper);color:var(--night);box-shadow:var(--shadow);font-weight:600;}
+  .modes svg{width:17px;height:17px;}
+
+  .view{display:none;}
+  .view.active{display:block;animation:fade 0.3s;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* Card */
+  .card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
+  .card-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card-title svg{width:18px;height:18px;color:var(--night-2);}
+  .card-sub{font-size:12.5px;color:var(--ink-faint);margin-bottom:18px;font-weight:300;}
+
+  /* Form */
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);margin-bottom:7px;}
+  .field label .sym{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:5px;background:var(--sleep-soft);color:var(--night);
+    font-size:11px;font-weight:700;margin-right:6px;
+  }
+  input[type=date],input[type=time],input[type=number],select{
+    width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
+    font-size:15px;font-family:inherit;color:var(--ink);background:var(--paper);
+    transition:border-color 0.15s;-webkit-appearance:none;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--night-2);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* Condition pills */
+  .cond-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .cond-row button{
+    border:1.5px solid var(--line);background:var(--paper);border-radius:var(--radius-sm);
+    padding:13px 6px;font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;
+    color:var(--ink-soft);transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  .cond-row button .emo{font-size:21px;line-height:1;}
+  .cond-row button.sel[data-v="1"]{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);}
+  .cond-row button.sel[data-v="2"]{border-color:var(--mid);background:var(--mid-bg);color:var(--mid);}
+  .cond-row button.sel[data-v="3"]{border-color:var(--good);background:var(--good-bg);color:var(--good);}
+
+  /* Live preview */
+  .live{
+    background:var(--canvas);border-radius:var(--radius-sm);padding:13px 15px;margin-top:4px;
+    display:flex;justify-content:space-around;text-align:center;
+  }
+  .live div{flex:1;}
+  .live .lab{font-size:11px;color:var(--ink-faint);margin-bottom:3px;}
+  .live .val{font-size:17px;font-weight:600;color:var(--night);}
+
+  /* Wake events */
+  .wake-block{background:var(--canvas);border-radius:var(--radius-sm);padding:14px;margin-top:4px;}
+  .wake-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--ink-soft);margin-bottom:4px;}
+  .wake-head .sym{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;background:#f5ddd0;color:var(--awake);font-size:11px;font-weight:700;}
+  .wake-hint{font-size:11.5px;color:var(--ink-faint);margin-bottom:12px;font-weight:300;}
+  .wake-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:9px;align-items:center;}
+  .wake-row input[type=time]{padding:10px 11px;font-size:14px;}
+  .wake-row .dur-wrap{position:relative;}
+  .wake-row .dur-wrap input{padding:10px 32px 10px 11px;font-size:14px;width:100%;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-family:inherit;color:var(--ink);-webkit-appearance:none;}
+  .wake-row .dur-wrap input:focus{outline:none;border-color:var(--night-2);}
+  .wake-row .dur-wrap .unit{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-faint);pointer-events:none;}
+  .wake-row .wake-rm{background:none;border:none;color:var(--ink-faint);cursor:pointer;padding:6px;display:flex;}
+  .wake-row .wake-rm svg{width:16px;height:16px;}
+  .wake-note{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--ink);background:var(--paper);-webkit-appearance:none;margin-bottom:9px;}
+  .wake-note:focus{outline:none;border-color:var(--night-2);}
+  .wake-add{background:var(--paper);border:1.5px dashed var(--line);color:var(--ink-soft);border-radius:var(--radius-sm);padding:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;}
+  .wake-add:active{background:var(--canvas);}
+  .wake-add svg{width:15px;height:15px;}
+  .wake-add[disabled]{opacity:0.4;cursor:default;}
+  .wake-none{font-size:13px;color:var(--ink-faint);text-align:center;padding:6px 0 12px;}
+  .note-chip{display:inline-block;background:#f5ddd0;color:#a85a30;font-size:10.5px;padding:1px 7px;border-radius:10px;margin-left:5px;font-weight:500;}
+  .freq-check{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px 12px;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;}
+  .freq-check input{position:absolute;opacity:0;width:0;height:0;}
+  .freq-check .freq-box{width:22px;height:22px;border:1.5px solid var(--line);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  .freq-check .freq-box svg{width:14px;height:14px;color:#fff;opacity:0;}
+  .freq-check input:checked + .freq-box{background:var(--awake);border-color:var(--awake);}
+  .freq-check input:checked + .freq-box svg{opacity:1;}
+  .freq-check input:checked ~ .freq-txt{color:var(--awake);font-weight:600;}
+  .freq-check.on{border-color:var(--awake);background:#fdf4ee;}
+  .freq-txt{font-size:13px;color:var(--ink-soft);line-height:1.4;}
+  .freq-txt em{font-style:normal;color:var(--ink-faint);font-size:11.5px;}
+
+  /* Primary button */
+  .btn{
+    width:100%;border:none;border-radius:var(--radius-sm);padding:15px;
+    font-size:15.5px;font-weight:600;font-family:inherit;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;
+  }
+  .btn-primary{background:var(--night);color:#fff;}
+  .btn-primary:active{transform:scale(0.985);background:var(--night-2);}
+  .btn svg{width:18px;height:18px;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);}
+  .btn-ghost:active{background:var(--canvas);}
+  .btn-sm{padding:11px;font-size:13.5px;}
+  .btn-row{display:flex;gap:10px;}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
+  .stat{background:var(--paper);border-radius:var(--radius-sm);padding:15px;box-shadow:var(--shadow);}
+  .stat .lab{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat .num{font-size:25px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
+  .stat .tag{font-size:11px;margin-top:4px;font-weight:500;}
+  .stat .tag.ok{color:var(--good);}
+  .stat .tag.warn{color:var(--mid);}
+
+  /* Timeline */
+  .tl-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--ink-soft);margin-top:14px;}
+  .tl-legend span{display:flex;align-items:center;gap:6px;}
+  .tl-legend i{width:13px;height:13px;border-radius:3px;display:inline-block;flex-shrink:0;}
+  .tl-legend b{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;background:var(--canvas);border:1px solid var(--line);border-radius:4px;font-size:10.5px;font-weight:700;color:var(--night-2);padding:0 3px;}
+  .tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tl-inner{min-width:560px;}
+  .tl-hours{display:flex;padding-left:52px;margin-bottom:7px;}
+  .tl-hours-inner{display:flex;flex:1;}
+  .tl-hours-inner div{flex:1;text-align:center;font-size:9.5px;color:var(--ink-faint);}
+  .tl-meta-head{width:62px;flex-shrink:0;text-align:right;font-size:9px;color:var(--ink-faint);padding-left:6px;white-space:nowrap;}
+  .tl-row{display:flex;align-items:center;margin-bottom:11px;}
+  .tl-date{width:52px;font-size:11px;color:var(--ink-soft);flex-shrink:0;font-weight:500;}
+  .tl-bar{position:relative;flex:1;height:24px;border-radius:6px;border:1px solid var(--line);}
+  .tl-cell{flex:1;}
+  .tl-hatch{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(216,100,60,0.5) 4px,rgba(216,100,60,0.5) 7px);pointer-events:none;border-radius:3px;}
+  .tl-mark{position:absolute;top:0;bottom:0;width:0;border-left:1.5px solid var(--ink-soft);opacity:0.55;transform:translateX(-0.75px);}
+  .tl-mark b{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--ink-soft);background:var(--paper);padding:0 2px;border-radius:2px;line-height:1.3;}
+  .tl-mark-o b{color:var(--night-2);}
+  .tl-meta{width:62px;flex-shrink:0;padding-left:6px;display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+  .tl-se-v{font-size:11px;font-weight:600;color:var(--ink);}
+  .tl-cond{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+  /* Empty state */
+  .empty{text-align:center;padding:40px 20px;color:var(--ink-faint);}
+  .empty svg{width:44px;height:44px;margin-bottom:12px;opacity:0.4;}
+  .empty p{font-size:14px;}
+
+  /* Analysis */
+  .analysis{background:linear-gradient(160deg,#f0f5fb,#e8f0f9);border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid #d8e4f2;}
+  .analysis .card-title{color:var(--night);}
+  .analysis ul{list-style:none;margin-top:6px;}
+  .analysis li{font-size:13.5px;color:#2c4a6e;line-height:1.7;padding-left:18px;position:relative;margin-bottom:7px;}
+  .analysis li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--night-2);}
+  .analysis .disc{font-size:11px;color:var(--ink-faint);margin-top:12px;font-style:normal;}
+
+  /* Recommendations */
+  .reco{background:linear-gradient(160deg,#fff8f3,#fef0e6);border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid #f5ddc8;}
+  .reco-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#b05a1e;margin-bottom:14px;}
+  .reco-head svg{width:19px;height:19px;}
+  .reco-item{background:var(--paper);border-radius:var(--radius-sm);padding:15px 16px;margin-bottom:10px;border:1px solid #f3e3d4;}
+  .reco-item:last-of-type{margin-bottom:0;}
+  .reco-item .r-title{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+  .reco-item .r-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .reco-item .r-body{font-size:13px;color:var(--ink-soft);line-height:1.65;}
+  .reco-item .r-link{display:inline-flex;align-items:center;gap:6px;margin-top:11px;font-size:12.5px;font-weight:600;color:#fff;background:var(--night);padding:9px 14px;border-radius:8px;text-decoration:none;transition:background 0.15s;}
+  .reco-item .r-link:active{background:var(--night-2);}
+  .reco-item .r-link svg{width:14px;height:14px;}
+  .reco-foot{font-size:11px;color:#b89878;margin-top:13px;line-height:1.5;}
+
+  /* Log list */
+  .log-item{background:var(--paper);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:9px;display:flex;align-items:center;gap:14px;}
+  .log-date{font-size:13px;font-weight:600;color:var(--night);min-width:54px;}
+  .log-detail{flex:1;font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .log-se{font-size:18px;font-weight:700;color:var(--ink);}
+  .log-cond{width:8px;height:36px;border-radius:4px;flex-shrink:0;}
+  .log-del{background:none;border:none;color:var(--ink-faint);cursor:pointer;padding:4px;}
+  .log-del svg{width:16px;height:16px;}
+
+  canvas{max-width:100%;}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--ink);color:#fff;padding:13px 22px;border-radius:30px;font-size:14px;font-weight:500;
+    box-shadow:var(--shadow-lift);opacity:0;transition:all 0.3s;z-index:100;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+  @media print{
+    header,.modes,.btn,.btn-row,#nav,.log-del,.tl-scroll{print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+    body{background:#fff;}
+  }
+
+  /* 홈 화면 설치 안내. 카톡 같은 앱 안의 브라우저로 열렸을 때도 여기로 알린다.
+     기록/추이 어느 쪽을 보고 있어도 한 번만 뜨도록 탭 바로 아래에 둔다. */
+  .install-bar{display:none;background:var(--paper);border:1.5px solid var(--line);
+    border-radius:var(--radius);padding:15px 16px;margin-bottom:16px;text-align:center;
+    box-shadow:var(--shadow);}
+  .install-bar.show{display:block;}
+  .install-bar p{font-size:12.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:11px;white-space:pre-line;}
+  .install-bar .row{display:flex;gap:8px;justify-content:center;}
+  .install-bar button{padding:11px 16px;border-radius:var(--radius-sm);border:none;font-family:inherit;
+    font-size:12.5px;font-weight:600;background:var(--night);color:#fff;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;}
+  .install-bar button.ghost{background:var(--paper);color:var(--ink-soft);border:1.5px solid var(--line);}
+  .install-bar button:active{transform:scale(.97);}
+</style>
+</head>
+<body>
+<header>
+  <div class="stars" id="stars"></div>
+  <h1><span class="moon"></span>수면일기</h1>
+  <p>매일 아침, 어젯밤 잠을 기록하세요</p>
+  <div class="brand">YD 정신건강의학과 &nbsp;·&nbsp; YD 퍼포먼스 인지행동치료 센터</div>
+</header>
+
+<div class="wrap">
+  <div class="modes" id="nav">
+    <button class="active" data-view="input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>기록
+    </button>
+    <button data-view="trends">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>추이
+    </button>
+  </div>
+  <!-- 설치 안내. 기록/추이 어느 탭에서도 보이도록 탭 바로 아래에 둔다 -->
+  <div class="install-bar" id="installBar">
+    <p id="installText"></p>
+    <div class="row">
+      <button id="installAction">홈 화면에 설치</button>
+      <button class="ghost" id="installClose">나중에</button>
+    </div>
+  </div>
+
+
+  <!-- INPUT VIEW -->
+  <div class="view active" id="view-input">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M3 5a2 2 0 012-2h14a2 2 0 012 2M3 5v14a2 2 0 002 2h14a2 2 0 002-2V5"/></svg>
+        오늘의 기록
+      </div>
+      <div class="card-sub">정확하지 않아도 괜찮습니다. 대략적인 추정으로 충분해요.</div>
+
+      <div class="field">
+        <label>날짜</label>
+        <input type="date" id="f-date">
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label><span class="sym">I</span>침실 들어간 시간</label>
+          <input type="time" id="f-bedin" value="23:00">
+        </div>
+        <div class="field">
+          <label><span class="sym">↓</span>실제 잠든 시각</label>
+          <input type="time" id="f-asleep" value="23:30">
+        </div>
+        <div class="field">
+          <label><span class="sym">↑</span>아침에 깬 시간</label>
+          <input type="time" id="f-wake" value="07:00">
+        </div>
+        <div class="field">
+          <label><span class="sym">O</span>침실 나온 시간</label>
+          <input type="time" id="f-bedout" value="07:15">
+        </div>
+        <div class="field">
+          <label><span class="sym">Z</span>낮잠 (분)</label>
+          <input type="number" id="f-nap" value="0" min="0" step="5" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="wake-block">
+        <div class="wake-head"><span class="sym">X</span>새벽에 깬 기록</div>
+        <div class="wake-hint">깬 시각과 다시 잠들기까지 걸린 시간을 대략 적어주세요. 왜 깼는지 메모도 도움이 됩니다.</div>
+        <div id="f-wakes"></div>
+        <button type="button" class="wake-add" id="f-wake-add">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          깬 기록 추가
+        </button>
+        <label class="freq-check" id="f-freq-wrap">
+          <input type="checkbox" id="f-freq">
+          <span class="freq-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+          <span class="freq-txt">너무 자주 깨서 일일이 적기 어려워요 <em>(4회 이상)</em></span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label>아침 컨디션</label>
+        <div class="cond-row" id="f-cond">
+          <button data-v="1"><span class="emo">😞</span>나쁘다</button>
+          <button data-v="2" class="sel"><span class="emo">😐</span>보통이다</button>
+          <button data-v="3"><span class="emo">😊</span>좋다</button>
+        </div>
+      </div>
+
+      <div class="live" id="f-live"></div>
+    </div>
+
+    <button class="btn btn-primary" id="f-save">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+      기록 저장하기
+    </button>
+  </div>
+
+  <!-- TRENDS VIEW -->
+  <div class="view" id="view-trends">
+    <div class="stats" id="t-stats"></div>
+    <div style="height:16px"></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        수면 타임라인
+      </div>
+      <div id="t-timeline"></div>
+      <div class="tl-legend">
+        <span><i style="background:#3b6db5"></i>실제 수면</span>
+        <span><i style="background:#c5d6ee"></i>누워서 깨어있음</span>
+        <span><i style="background:#e08a5c"></i>야간 각성</span>
+        <span><i style="background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(216,100,60,0.6) 2px,rgba(216,100,60,0.6) 4px)"></i>자주 깸</span>
+        <span><i style="background:#9b8fd4"></i>낮잠</span>
+      </div>
+      <div class="tl-legend" style="margin-top:8px;">
+        <span><b>I</b> 누운 시각</span>
+        <span><b>O</b> 침대에서 나온 시각</span>
+      </div>
+      <div class="tl-legend" style="margin-top:8px;border-top:1px solid var(--line-soft);padding-top:10px;">
+        <span style="color:var(--ink-faint);font-weight:500;">아침 컨디션</span>
+        <span><i style="background:var(--good);border-radius:50%"></i>좋다</span>
+        <span><i style="background:var(--mid);border-radius:50%"></i>보통</span>
+        <span><i style="background:var(--bad);border-radius:50%"></i>나쁘다</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>
+        수면효율(SE) 추이
+      </div>
+      <div style="position:relative;height:220px;margin-top:6px;">
+        <canvas id="t-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="analysis" id="t-analysis" style="display:none;">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
+        패턴 분석
+      </div>
+      <ul id="t-analysis-list"></ul>
+      <div class="disc">※ 임상적 판단을 대신하지 않습니다. 진료 시 참고용으로 활용하세요.</div>
+    </div>
+
+    <div class="reco" id="t-reco" style="display:none;">
+      <div class="reco-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg>
+        <span>이렇게 해보세요</span>
+      </div>
+      <div id="t-reco-list"></div>
+      <div class="reco-foot">상기 안내는 기록된 패턴을 바탕으로 한 일반적 제안입니다. 정확한 평가와 치료는 진료를 통해 이루어집니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h6"/></svg>
+        기록 내역
+      </div>
+      <div class="card-sub" id="r-count"></div>
+      <div id="r-log"></div>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" id="r-print" style="margin-bottom:10px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z"/></svg>
+      인쇄 / PDF로 저장
+    </button>
+    <button class="btn btn-ghost btn-sm" id="r-clear" style="color:var(--bad);border-color:#f0d0c5;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+      전체 기록 삭제
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Chart.js를 저장소 안에 두고 쓴다. cdnjs에서 받아오면 인터넷이 없을 때
+     「추이」 탭이 Chart is not defined 로 멈춘다. 설치해서 쓰는 앱이라
+     밖에서 받아오는 것이 하나도 없어야 한다. (Chart.js v4.4.1, MIT) -->
+<script src="chart.umd.js"></script>
+<script>
+(function(){
+  "use strict";
+  var KEY = "sleepDiary.v1";
+  var entries = load();
+  var selCond = 2;
+  var wakes = [];   // working wake-events for the form: [{time,dur,note}]
+  var chart = null;
+  var MAX_WAKES = 3;
+
+  // starfield
+  (function(){
+    var s = document.getElementById('stars'), html='';
+    for(var i=0;i<18;i++){
+      var sz=Math.random()*2+1;
+      html+='<span style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(Math.random()*4)+'s"></span>';
+    }
+    s.innerHTML=html;
+  })();
+
+  document.getElementById('f-date').valueAsDate = new Date();
+
+  // ---- storage ----
+  function load(){
+    var arr;
+    try{ arr = JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ return []; }
+    // migrate: old entries stored a single waso number; convert to a wakes array
+    arr.forEach(function(e){
+      if(!e.wakes){
+        if(e.waso>0){ e.wakes=[{time:'',dur:+e.waso,note:''}]; }
+        else { e.wakes=[]; }
+      }
+    });
+    return arr;
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(entries)); }catch(e){ toast('저장 공간이 부족합니다'); } }
+
+  // total minutes awake during the night, summed from wake events
+  function wasoTotal(e){
+    if(!e.wakes||!e.wakes.length) return +e.waso||0;
+    return e.wakes.reduce(function(a,w){return a+(+w.dur||0);},0);
+  }
+  // night flagged as "too frequent to record individually" (4+ awakenings)
+  function isFreq(e){ return e && e.freq===true; }
+
+  // ---- time math ----
+  function toMin(t){ if(!t) return null; var p=t.split(':'); return (+p[0])*60+(+p[1]); }
+  function span(a,b){ var s=toMin(a),e=toMin(b); if(s==null||e==null) return 0; var d=e-s; if(d<0)d+=1440; return d; }
+  function fmtDur(m){ m=Math.round(m); var h=Math.floor(m/60),mm=m%60; return h+'시간 '+(mm<10?'0':'')+mm+'분'; }
+
+  function calc(e){
+    var tib=span(e.bedin,e.bedout);
+    var tst=span(e.asleep,e.wake)-wasoTotal(e); if(tst<0)tst=0;
+    var se=tib>0?Math.round(tst/tib*1000)/10:0;
+    var sol=span(e.bedin,e.asleep);
+    return {tib:tib,tst:tst,se:se,sol:sol};
+  }
+
+  // ---- condition pills ----
+  document.querySelectorAll('#f-cond button').forEach(function(b){
+    b.addEventListener('click',function(){
+      selCond=+b.dataset.v;
+      document.querySelectorAll('#f-cond button').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');
+    });
+  });
+
+  // ---- wake events ----
+  function renderWakes(){
+    var box=document.getElementById('f-wakes');
+    if(!wakes.length){
+      box.innerHTML='<div class="wake-none">새벽에 깨지 않았다면 그대로 두세요.</div>';
+    } else {
+      var html='';
+      wakes.forEach(function(w,i){
+        html+='<div class="wake-row" data-i="'+i+'">'+
+          '<input type="time" class="wk-time" value="'+(w.time||'')+'" aria-label="깬 시각">'+
+          '<div class="dur-wrap"><input type="number" class="wk-dur" value="'+(w.dur||'')+'" min="0" step="5" inputmode="numeric" placeholder="0" aria-label="지속 분"><span class="unit">분</span></div>'+
+          '<button type="button" class="wake-rm" aria-label="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>'+
+          '</div>'+
+          '<input type="text" class="wake-note" value="'+(w.note||'').replace(/"/g,'&quot;')+'" placeholder="왜 깼나요? (예: 소변, 답답함, 갈증, 이유 모름)" aria-label="메모">';
+      });
+      box.innerHTML=html;
+      box.querySelectorAll('.wake-row').forEach(function(row){
+        var i=+row.dataset.i;
+        row.querySelector('.wk-time').addEventListener('input',function(e){ wakes[i].time=e.target.value; live(); });
+        row.querySelector('.wk-dur').addEventListener('input',function(e){ wakes[i].dur=+e.target.value||0; live(); });
+        row.querySelector('.wake-rm').addEventListener('click',function(){ wakes.splice(i,1); renderWakes(); live(); });
+      });
+      box.querySelectorAll('.wake-note').forEach(function(n,idx){
+        n.addEventListener('input',function(e){ wakes[idx].note=e.target.value; });
+      });
+    }
+    var addBtn=document.getElementById('f-wake-add');
+    if(wakes.length>=MAX_WAKES){ addBtn.setAttribute('disabled','disabled'); }
+    else { addBtn.removeAttribute('disabled'); }
+  }
+  document.getElementById('f-wake-add').addEventListener('click',function(){
+    if(wakes.length>=MAX_WAKES) return;
+    wakes.push({time:'',dur:20,note:''});
+    renderWakes(); live();
+  });
+  renderWakes();
+
+  // ---- frequent-awakening checkbox ----
+  var freqChk=document.getElementById('f-freq');
+  var freqWrap=document.getElementById('f-freq-wrap');
+  function syncFreqUI(){
+    freqWrap.classList.toggle('on', freqChk.checked);
+    // when "too frequent to record" is on, dim the per-event area (kept, but de-emphasized)
+    var wb=document.getElementById('f-wakes'), ab=document.getElementById('f-wake-add');
+    if(freqChk.checked){
+      wb.style.opacity='0.45'; ab.style.opacity='0.45';
+    } else {
+      wb.style.opacity=''; ab.style.opacity='';
+    }
+  }
+  freqChk.addEventListener('change',function(){ syncFreqUI(); live(); });
+
+  // ---- live preview ----
+  function readForm(){
+    return {
+      date:document.getElementById('f-date').value,
+      bedin:document.getElementById('f-bedin').value,
+      asleep:document.getElementById('f-asleep').value,
+      wake:document.getElementById('f-wake').value,
+      bedout:document.getElementById('f-bedout').value,
+      wakes:wakes.map(function(w){return {time:w.time,dur:+w.dur||0,note:w.note||''};}),
+      freq:freqChk.checked,
+      nap:+document.getElementById('f-nap').value||0,
+      cond:selCond
+    };
+  }
+  function live(){
+    var c=calc(readForm());
+    var waso=wasoTotal(readForm());
+    document.getElementById('f-live').innerHTML=
+      '<div><div class="lab">예상 수면효율</div><div class="val">'+c.se+'%</div></div>'+
+      '<div><div class="lab">총 수면시간</div><div class="val" style="font-size:14px;line-height:1.7">'+fmtDur(c.tst)+'</div></div>'+
+      '<div><div class="lab">새벽 각성</div><div class="val" style="font-size:14px;line-height:1.7">'+Math.round(waso)+'분</div></div>';
+  }
+  ['f-bedin','f-asleep','f-wake','f-bedout'].forEach(function(id){
+    document.getElementById(id).addEventListener('input',live);
+  });
+  live();
+
+  // ---- save ----
+  document.getElementById('f-save').addEventListener('click',function(){
+    var e=readForm();
+    if(!e.date){ toast('날짜를 선택하세요'); return; }
+    var i=entries.findIndex(function(x){return x.date===e.date;});
+    if(i>=0){ entries[i]=e; toast('기록을 수정했습니다'); }
+    else { entries.push(e); toast('기록을 저장했습니다'); }
+    entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+    save(); renderAll();
+    var d=new Date(document.getElementById('f-date').value);
+    d.setDate(d.getDate()+1);
+    document.getElementById('f-date').valueAsDate=d;
+    wakes=[]; renderWakes();
+    freqChk.checked=false; syncFreqUI();
+    live();
+  });
+
+  // ---- mode nav ----
+  document.querySelectorAll('#nav button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#nav button').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      document.getElementById('view-'+b.dataset.view).classList.add('active');
+      if(b.dataset.view==='trends') renderChart();
+    });
+  });
+
+  function condColor(c){ return c===1?'var(--bad)':c===3?'var(--good)':'var(--mid)'; }
+  function condLabel(c){ return c===1?'나쁘다':c===3?'좋다':'보통'; }
+
+  // ---- stats ----
+  function renderStats(){
+    var box=document.getElementById('t-stats');
+    if(!entries.length){ box.innerHTML=''; return; }
+    var n=entries.length;
+    var aSe=Math.round(entries.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
+    var aTst=entries.reduce(function(a,e){return a+calc(e).tst;},0)/n;
+    var aSol=Math.round(entries.reduce(function(a,e){return a+calc(e).sol;},0)/n);
+    function st(lab,num,tag,cls){
+      return '<div class="stat"><div class="lab">'+lab+'</div><div class="num">'+num+'</div>'+(tag?'<div class="tag '+cls+'">'+tag+'</div>':'')+'</div>';
+    }
+    box.innerHTML=
+      st('평균 수면효율',aSe+'%',aSe>=85?'양호':'효율 떨어짐',aSe>=85?'ok':'warn')+
+      st('평균 총수면',fmtDur(aTst),'','')+
+      st('평균 입면시간',aSol+'분',aSol>30?'다소 김':'정상',aSol>30?'warn':'ok')+
+      st('기록 일수',n+'일','','');
+  }
+
+  // ---- timeline ----
+  function renderTimeline(){
+    var box=document.getElementById('t-timeline');
+    if(!entries.length){
+      box.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p>기록을 추가하면 타임라인이 나타납니다</p></div>';
+      return;
+    }
+    var startH=20;
+    var hoursLab='<div class="tl-hours"><div class="tl-hours-inner">';
+    for(var i=0;i<24;i++){ var h=(startH+i)%24; var disp=h===0?'12':h>12?(h-12):h; hoursLab+='<div>'+(i%2===0?disp:'')+'</div>'; }
+    hoursLab+='</div><div class="tl-meta-head">SE · 컨디션</div></div>';
+
+    var rows='';
+    var WIN=24*60; // 1440 minutes shown, starting at startH:00
+    var base=startH*60;
+    entries.forEach(function(e){
+      var c=calc(e);
+      // minute array across the visible window: 0 empty,1 sleep,2 awake(during sleep),3 nap,4 in-bed-awake
+      var mins=new Array(WIN).fill(0);
+      function paint(st,en,val){
+        var s=toMin(st),x=toMin(en); if(s==null||x==null)return;
+        var so=((s-base)%1440+1440)%1440, eo=((x-base)%1440+1440)%1440;
+        if(eo<=so)eo+=1440;
+        for(var m=so;m<eo&&m<WIN;m++){ if(m>=0)mins[m]=val; }
+      }
+      // 1) time in bed (I → O): settling + lying awake shows as light blue
+      paint(e.bedin,e.bedout,4);
+      // 2) actual sleep block overlays the in-bed band
+      paint(e.asleep,e.wake,1);
+      // 3) overlay awakenings during sleep (only those with a recorded time)
+      (e.wakes||[]).forEach(function(w){
+        if(!w.time||!(+w.dur>0)) return;
+        var wEnd=(toMin(w.time)+(+w.dur))%1440;
+        paint(w.time, (wEnd<60?'0':Math.floor(wEnd/60)+':'+('0'+(wEnd%60)).slice(-2)), 2);
+      });
+      // 4) nap
+      if(+e.nap>0){
+        paint('13:00','13:'+('0'+Math.min(59,+e.nap)).slice(-2), 3);
+      }
+      // collapse to gradient stops
+      var col={0:'transparent',1:'#3b6db5',2:'#e08a5c',3:'#9b8fd4',4:'#c5d6ee'};
+      var stops=[], cur=mins[0], segStart=0;
+      for(var m=1;m<=WIN;m++){
+        if(m===WIN||mins[m]!==cur){
+          var p0=(segStart/WIN*100), p1=(m/WIN*100);
+          stops.push(col[cur]+' '+p0.toFixed(2)+'% '+p1.toFixed(2)+'%');
+          if(m<WIN){ cur=mins[m]; segStart=m; }
+        }
+      }
+      var grad='linear-gradient(90deg,'+stops.join(',')+')';
+      // position helper for markers (returns % within window, or null if outside)
+      function posPct(t){
+        var v=toMin(t); if(v==null) return null;
+        var o=((v-base)%1440+1440)%1440;
+        return o/WIN*100;
+      }
+      var markers='';
+      var pI=posPct(e.bedin), pO=posPct(e.bedout);
+      if(pI!=null) markers+='<span class="tl-mark" style="left:'+pI.toFixed(2)+'%"><b>I</b></span>';
+      if(pO!=null) markers+='<span class="tl-mark tl-mark-o" style="left:'+pO.toFixed(2)+'%"><b>O</b></span>';
+      // frequent-awakening: lay a diagonal hatch across the sleep span to signal fragmentation
+      var hatch='';
+      if(isFreq(e)){
+        var hs=posPct(e.asleep), he=posPct(e.wake);
+        if(hs!=null && he!=null){
+          var w0=hs, w1=he; if(w1<=w0) w1=100; // clamp wrap visually
+          hatch='<div class="tl-hatch" style="left:'+w0.toFixed(2)+'%;width:'+(w1-w0).toFixed(2)+'%"></div>';
+        }
+      }
+      var bar='<div class="tl-bar" style="background:'+grad+'">'+hatch+markers+'</div>';
+      var dl=e.date?e.date.slice(5).replace('-','/'):'—';
+      // small note indicator if any wake has a memo
+      var hasNote=(e.wakes||[]).some(function(w){return w.note&&w.note.trim();});
+      var condDot='<span class="tl-cond" style="background:'+condColor(e.cond)+'" title="'+condLabel(e.cond)+'"></span>';
+      rows+='<div class="tl-row"><div class="tl-date">'+dl+(hasNote?' <span title="메모 있음" style="color:var(--awake)">•</span>':'')+'</div>'+bar+'<div class="tl-meta"><span class="tl-se-v">'+c.se+'%</span>'+condDot+'</div></div>';
+    });
+    box.innerHTML='<div class="tl-scroll"><div class="tl-inner">'+hoursLab+rows+'</div></div>';
+  }
+
+  // ---- chart ----
+  function renderChart(){
+    var ctx=document.getElementById('t-chart');
+    if(!ctx) return;
+    var labels=entries.map(function(e){return e.date?e.date.slice(5).replace('-','/'):'';});
+    var seData=entries.map(function(e){return calc(e).se;});
+    var condData=entries.map(function(e){return e.cond;});
+    var condHex={1:'#d8643c',2:'#c9911a',3:'#2f9e75'};
+    var condPtColors=entries.map(function(e){return condHex[e.cond]||'#c9911a';});
+    if(chart) chart.destroy();
+    if(!entries.length){ return; }
+    chart=new Chart(ctx,{
+      data:{labels:labels,datasets:[
+        {type:'line',label:'수면효율(%)',data:seData,yAxisID:'y',borderColor:'#3b6db5',backgroundColor:'rgba(59,109,181,0.10)',fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:'#3b6db5',pointBorderColor:'#3b6db5',borderWidth:2.5,order:1},
+        {type:'line',label:'아침 컨디션',data:condData,yAxisID:'y2',borderColor:'rgba(150,150,150,0.45)',borderDash:[5,4],backgroundColor:'transparent',fill:false,tension:0.2,pointRadius:5,pointBackgroundColor:condPtColors,pointBorderColor:condPtColors,borderWidth:1.5,order:0}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,position:'bottom',labels:{boxWidth:12,boxHeight:12,font:{size:11.5},color:'#5a6675',padding:14,usePointStyle:true}},
+          tooltip:{callbacks:{label:function(c){
+            if(c.dataset.yAxisID==='y2'){ var m={1:'나쁘다',2:'보통',3:'좋다'}; return '아침 컨디션: '+(m[c.parsed.y]||''); }
+            var base='수면효율 '+c.parsed.y+'%';
+            if(entries[c.dataIndex] && isFreq(entries[c.dataIndex])) base+=' · 자주 깸(4회+)';
+            return base;
+          }}}
+        },
+        scales:{
+          y:{position:'left',min:Math.max(0,Math.min.apply(null,seData.concat([80]))-10),max:100,title:{display:true,text:'수면효율',color:'#3b6db5',font:{size:10.5}},ticks:{callback:function(v){return v+'%';},color:'#9aa4b2',font:{size:11}},grid:{color:'rgba(154,164,178,0.15)'}},
+          y2:{position:'right',min:0.7,max:3.3,title:{display:true,text:'컨디션',color:'#888',font:{size:10.5}},ticks:{stepSize:1,callback:function(v){return {1:'나쁨',2:'보통',3:'좋음'}[v]||'';},color:'#9aa4b2',font:{size:11}},grid:{drawOnChartArea:false}},
+          x:{ticks:{color:'#9aa4b2',font:{size:11},autoSkip:false,maxRotation:45},grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // ---- analysis ----
+  function renderAnalysis(){
+    var box=document.getElementById('t-analysis');
+    if(entries.length<3){ box.style.display='none'; return; }
+    box.style.display='block';
+    var n=entries.length;
+    var aSe=entries.reduce(function(a,e){return a+calc(e).se;},0)/n;
+    var aSol=entries.reduce(function(a,e){return a+calc(e).sol;},0)/n;
+    var aWaso=entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n;
+    var ses=entries.map(function(e){return calc(e).se;});
+    var sd=Math.round(Math.sqrt(ses.reduce(function(a,v){return a+Math.pow(v-aSe,2);},0)/ses.length)*10)/10;
+    var bedins=entries.map(function(e){return toMin(e.bedin);}).filter(function(v){return v!=null;});
+    // normalize around midnight: evening hours (>=18:00) treated on a continuous scale
+    // so 23:00 and 01:00 are 2h apart, not 22h. Anchor: shift <12:00 by +24h.
+    var bedinsNorm=bedins.map(function(m){ return m<12*60 ? m+1440 : m; });
+    var spread=bedins.length>1?Math.round(Math.max.apply(null,bedinsNorm)-Math.min.apply(null,bedinsNorm)):0;
+
+    // gather all timed wake events
+    var allWakes=[];
+    entries.forEach(function(e){ (e.wakes||[]).forEach(function(w){ if(w.time) allWakes.push(w); }); });
+    var nightsWithWake=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time||w.dur>0;})||isFreq(e);}).length;
+    var freqNights=entries.filter(isFreq).length;
+
+    var L=[];
+    if(aSe>=85) L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 양호한 수준입니다.');
+    else if(aSe>=80) L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 경계선에 있습니다. 수면 제한 요법으로 개선 여지가 있습니다.');
+    else L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 낮은 편입니다. CBT-I의 수면 제한·자극 조절이 도움이 될 수 있습니다.');
+    if(aSol>30) L.push('평균 입면시간이 '+Math.round(aSol)+'분으로, 잠들기까지 시간이 다소 깁니다.');
+
+    // wake frequency + timing analysis
+    if(freqNights>0) L.push('하룻밤에 4회 이상 자주 깬 날이 '+freqNights+'/'+n+'일 있습니다 — 수면 분절이 심한 편으로, 깊은 수면 유지에 어려움이 시사됩니다.');
+    if(aWaso>30) L.push('야간 각성이 평균 '+Math.round(aWaso)+'분으로 수면 유지의 어려움이 관찰됩니다 ('+nightsWithWake+'/'+n+'일 발생).');
+    else if(nightsWithWake>0) L.push('야간 각성이 '+nightsWithWake+'/'+n+'일 기록되었습니다'+(aWaso>0?' (평균 '+Math.round(aWaso)+'분)':'')+'.');
+
+    // count distinct nights that have at least one recorded wake TIME
+    var nightsWithWakeTime=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time;});}).length;
+    if(allWakes.length>=2 && nightsWithWakeTime>=2){
+      var times=allWakes.map(function(w){
+        var m=toMin(w.time);
+        // treat evening hours (>=18:00) as "previous night" so dawn hours sort later
+        return m<12*60 ? m+24*60 : m;
+      });
+      var avgT=times.reduce(function(a,v){return a+v;},0)/times.length;
+      var hh=Math.floor((avgT%1440)/60), mm=Math.round(avgT%60);
+      var tStr=(hh===0?'12':hh>12?hh-12:hh)+(hh>=12&&hh<24?'시':'시')+(mm?' '+mm+'분':'')+'경';
+      // cluster check: are wakes consistently in a narrow window?
+      var minT=Math.min.apply(null,times),maxT=Math.max.apply(null,times);
+      var clustered=(maxT-minT)<=90;
+      if(clustered){
+        L.push('깨는 시각이 평균 '+tStr+'으로 비교적 일정합니다 — 시간대가 일관되면 원인(야간뇨·무호흡·조기각성 등) 감별에 참고할 수 있습니다.');
+      } else {
+        L.push('깨는 시각이 밤 전반에 흩어져 있습니다 — 특정 시간대 패턴은 뚜렷하지 않습니다.');
+      }
+      // early-morning awakening flag (3~5am): require it to recur across multiple nights
+      var earlyNights=entries.filter(function(e){return (e.wakes||[]).some(function(w){var m=toMin(w.time); return m!=null && m>=3*60 && m<=5*60;});}).length;
+      if(earlyNights>=2 && earlyNights>=Math.ceil(nightsWithWakeTime*0.6)) L.push('새벽 3~5시 조기 각성이 여러 날 반복됩니다.');
+    }
+
+    // recurring memo themes (simple keyword tally)
+    var notes=allWakes.map(function(w){return (w.note||'').trim();}).filter(Boolean);
+    if(notes.length>=2){
+      var kw={'소변':0,'화장실':0,'답답':0,'갈증':0,'목말':0,'통증':0,'꿈':0,'더워':0,'추워':0,'소리':0};
+      notes.forEach(function(t){ Object.keys(kw).forEach(function(k){ if(t.indexOf(k)>=0) kw[k]++; }); });
+      var top=Object.keys(kw).filter(function(k){return kw[k]>=2;});
+      if(top.length) L.push('반복되는 각성 사유: '+top.join(', ')+' — 진료 시 확인해볼 수 있습니다.');
+    }
+
+    if(spread>180) L.push('취침 시각이 약 '+(spread/60).toFixed(1)+'시간 범위로 들쭉날쭉합니다. 매일 비슷한 시간에 잠자리에 드는 것이 도움이 됩니다.');
+    else if(spread>120) L.push('취침 시각이 약 '+(spread/60).toFixed(1)+'시간 정도 차이가 있습니다. 조금 더 일정하게 맞추면 수면 리듬에 도움이 됩니다.');
+    if(sd>10) L.push('수면효율의 날짜별 변동이 큽니다 (±'+sd+'%).');
+
+    // morning condition + subjective/objective relationship
+    var aCond=entries.reduce(function(a,e){return a+(e.cond||2);},0)/n;
+    var condTxt=aCond>=2.5?'대체로 좋은 편':aCond>=1.8?'보통 수준':'좋지 않은 편';
+    L.push('아침 컨디션은 평균 '+condTxt+'입니다 (3점 만점에 '+Math.round(aCond*10)/10+'점).');
+    // correlation-lite: compare SE and condition direction
+    if(n>=4){
+      var seMean=aSe, condMean=aCond, num=0, dse=0, dco=0;
+      entries.forEach(function(e){ var x=calc(e).se-seMean, y=(e.cond||2)-condMean; num+=x*y; dse+=x*x; dco+=y*y; });
+      var r=(dse>0&&dco>0)?num/Math.sqrt(dse*dco):0;
+      if(r>=0.4) L.push('수면효율이 높은 날 아침 컨디션도 좋은 경향이 뚜렷합니다 — 객관적 수면과 주관적 만족도가 함께 움직입니다.');
+      else if(r<=-0.2) L.push('수면효율과 아침 컨디션이 반대로 움직이는 날이 있습니다 — 수치는 좋아도 개운하지 않은 경우로, 비회복성 수면이나 수면의 질 문제를 시사할 수 있습니다.');
+      else if(Math.abs(r)<0.2) L.push('수면효율과 아침 컨디션 사이에 뚜렷한 연관이 보이지 않습니다 — 주관적 만족도가 수면 수치만으로 설명되지 않을 수 있습니다.');
+    }
+
+    if(L.length===1 && aSe>=85) L.push('전반적으로 안정적인 수면 패턴을 보이고 있습니다.');
+
+    document.getElementById('t-analysis-list').innerHTML=L.map(function(x){return '<li>'+x+'</li>';}).join('');
+  }
+
+  // ---- recommendations (plain-language, action-oriented) ----
+  var LINK_CBTI='https://blog.naver.com/psychoedu/224171054991';
+  var LINK_PSG='https://blog.naver.com/psychoedu/224242416557';
+  function linkBtn(url,label){
+    return '<a class="r-link" href="'+url+'" target="_blank" rel="noopener">'+label+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a>';
+  }
+  function renderRecommendations(){
+    var box=document.getElementById('t-reco');
+    if(entries.length<3){ box.style.display='none'; return; }
+    var n=entries.length;
+    var aSe=entries.reduce(function(a,e){return a+calc(e).se;},0)/n;
+    var aCond=entries.reduce(function(a,e){return a+(e.cond||2);},0)/n;
+    var aWaso=entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n;
+    var freqNights=entries.filter(isFreq).length;
+    var nightsWithWake=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time||w.dur>0;})||isFreq(e);}).length;
+
+    var R=[];
+
+    // Rule 1: low sleep efficiency → CBT-I
+    if(aSe<85){
+      R.push({
+        color:'var(--bad)',
+        title:'수면 습관을 점검해볼 시점이에요',
+        body:'침대에 누워 있는 시간에 비해 실제로 잠든 시간이 짧은 편입니다(평균 수면효율 '+Math.round(aSe*10)/10+'%). 이런 경우엔 약으로 잠을 재우기보다, 잠드는 습관과 잠에 대한 생각을 바로잡는 <b>불면증 인지행동치료(CBT-I)</b>가 도움이 될 수 있어요. 억지로 재우는 게 아니라, 잠이 자연스럽게 찾아오던 상태로 돌아가도록 돕는 방법입니다.',
+        link:linkBtn(LINK_CBTI,'CBT-I가 무엇인지 알아보기')
+      });
+    }
+    // Rule 2: good SE but poor morning condition → sleep misperception → CBT-I
+    else if(aSe>=85 && aCond<1.8){
+      R.push({
+        color:'var(--mid)',
+        title:'잘 잤는데도 개운하지 않다면',
+        body:'수면효율은 양호한 편인데(평균 '+Math.round(aSe*10)/10+'%) 아침 컨디션은 낮게 느껴지고 있습니다. 실제로는 충분히 잤는데도 \'못 잤다\'고 느끼는 <b>수면 오지각</b>일 가능성이 있어요. 이런 경우엔 수면에 대한 불안과 생각을 함께 다루는 <b>불면증 인지행동치료(CBT-I)</b>가 도움이 됩니다.',
+        link:linkBtn(LINK_CBTI,'CBT-I가 무엇인지 알아보기')
+      });
+    }
+    // Rule 3: recurring/frequent night awakenings → organic cause → PSG
+    if(nightsWithWake>=Math.ceil(n*0.5) || aWaso>30 || freqNights>=Math.ceil(n*0.3)){
+      var freqPhrase = freqNights>0
+        ? '하룻밤에 4회 이상 자주 깬 날이 '+freqNights+'/'+n+'일 있을 만큼 수면이 자주 끊기고 있습니다.'
+        : '새벽 각성이 반복되고 있습니다('+nightsWithWake+'/'+n+'일'+(aWaso>0?', 평균 '+Math.round(aWaso)+'분':'')+').';
+      R.push({
+        color:'var(--night-2)',
+        title:'새벽에 자주 깬다면 원인을 확인해보세요',
+        body:freqPhrase+' 잠드는 습관 외에 코골이·수면무호흡 같은 <b>몸의 원인</b>이 숨어 있을 수 있어요. 특히 약을 먹어도 개운하지 않거나 낮에 많이 졸리다면, 전문가와 함께 <b>수면다원검사</b>로 원인을 확인해보시길 권합니다.',
+        link:linkBtn(LINK_PSG,'수면다원검사 알아보기')
+      });
+    }
+
+    if(!R.length){
+      R.push({
+        color:'var(--good)',
+        title:'좋은 흐름을 보이고 있어요',
+        body:'기록상 수면효율과 아침 컨디션이 모두 안정적입니다. 지금의 규칙적인 수면 리듬을 유지해보세요. 혹시 패턴이 달라지면 이 화면에서 다시 안내해 드릴게요.',
+        link:''
+      });
+    }
+    box.style.display='block';
+    document.getElementById('t-reco-list').innerHTML=R.map(function(r){
+      return '<div class="reco-item">'+
+        '<div class="r-title"><span class="dot" style="background:'+r.color+'"></span>'+r.title+'</div>'+
+        '<div class="r-body">'+r.body+'</div>'+
+        r.link+
+        '</div>';
+    }).join('');
+  }
+
+  // ---- review log ----
+  function renderLog(){
+    document.getElementById('r-count').textContent=entries.length?entries.length+'일의 기록':'아직 기록이 없습니다';
+    var box=document.getElementById('r-log');
+    if(!entries.length){
+      box.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h6"/></svg><p>기록 탭에서 첫 기록을 추가해보세요</p></div>';
+      return;
+    }
+    var html='';
+    entries.slice().reverse().forEach(function(e){
+      var c=calc(e);
+      var waso=Math.round(wasoTotal(e));
+      // build wake summary: times + notes
+      var wk=(e.wakes||[]).filter(function(w){return w.time||w.dur>0;});
+      var wkStr='';
+      if(isFreq(e)){
+        wkStr='<br><span style="color:var(--awake)">깸:</span> <span class="note-chip" style="background:#f5ddd0;color:#a85a30">자주 깸 (4회 이상)</span>';
+        if(wk.length){
+          wkStr+=' '+wk.map(function(w){
+            var t=w.time?w.time:'시각미상';
+            var d=w.dur?' '+w.dur+'분':'';
+            return t+d;
+          }).join(' · ');
+        }
+      } else if(wk.length){
+        wkStr='<br><span style="color:var(--awake)">깸:</span> '+wk.map(function(w){
+          var t=w.time?w.time:'시각미상';
+          var d=w.dur?' '+w.dur+'분':'';
+          var nt=w.note&&w.note.trim()?' <span class="note-chip">'+w.note.trim()+'</span>':'';
+          return t+d+nt;
+        }).join(' · ');
+      }
+      html+='<div class="log-item">'+
+        '<div class="log-cond" style="background:'+condColor(e.cond)+'"></div>'+
+        '<div style="flex:1"><div class="log-date">'+(e.date?e.date.slice(5).replace('-','/'):'—')+'</div>'+
+        '<div class="log-detail">잠든시각 '+e.asleep+' · 기상 '+e.wake+'<br>총수면 '+fmtDur(c.tst)+' · 각성 '+waso+'분 · '+condLabel(e.cond)+wkStr+'</div></div>'+
+        '<div class="log-se">'+c.se+'%</div>'+
+        '<button class="log-del" data-d="'+e.date+'" aria-label="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>'+
+        '</div>';
+    });
+    box.innerHTML=html;
+    box.querySelectorAll('.log-del').forEach(function(b){
+      b.addEventListener('click',function(){
+        entries=entries.filter(function(x){return x.date!==b.dataset.d;});
+        save(); renderAll();
+      });
+    });
+  }
+
+  // ---- export (clean clinical summary for printing / PDF) ----
+  function buildPrintHTML(){
+    var today=new Date().toISOString().slice(0,10);
+    var n=entries.length;
+    // summary stats
+    var statsHTML='';
+    if(n){
+      var aSe=Math.round(entries.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
+      var aTst=entries.reduce(function(a,e){return a+calc(e).tst;},0)/n;
+      var aSol=Math.round(entries.reduce(function(a,e){return a+calc(e).sol;},0)/n);
+      var aWaso=Math.round(entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n);
+      var aCond=Math.round(entries.reduce(function(a,e){return a+(e.cond||2);},0)/n*10)/10;
+      statsHTML='<div class="psum">'+
+        '<div><span>'+aSe+'%</span>평균 수면효율</div>'+
+        '<div><span>'+fmtDur(aTst)+'</span>평균 총수면</div>'+
+        '<div><span>'+aSol+'분</span>평균 입면시간</div>'+
+        '<div><span>'+aWaso+'분</span>평균 야간각성</div>'+
+        '<div><span>'+aCond+' / 3</span>평균 컨디션</div>'+
+        '<div><span>'+n+'일</span>기록 일수</div>'+
+        '</div>';
+    }
+    // data table
+    var rowsHTML='';
+    entries.forEach(function(e){
+      var c=calc(e);
+      var wkParts=(e.wakes||[]).filter(function(w){return w.time||w.dur>0;}).map(function(w){
+        return (w.time||'미상')+(w.dur?' '+w.dur+'분':'')+(w.note&&w.note.trim()?'('+w.note.trim()+')':'');
+      });
+      var wk;
+      if(isFreq(e)){
+        wk='자주 깸(4회+)'+(wkParts.length?' · '+wkParts.join(', '):'');
+      } else {
+        wk=wkParts.join(', ')||'—';
+      }
+      rowsHTML+='<tr>'+
+        '<td>'+(e.date||'')+'</td>'+
+        '<td>'+e.bedin+'</td>'+
+        '<td>'+e.asleep+'</td>'+
+        '<td>'+e.wake+'</td>'+
+        '<td>'+e.bedout+'</td>'+
+        '<td>'+fmtDur(c.tst)+'</td>'+
+        '<td class="se">'+c.se+'%</td>'+
+        '<td>'+Math.round(wasoTotal(e))+'분</td>'+
+        '<td style="text-align:left">'+wk+'</td>'+
+        '<td>'+condLabel(e.cond)+'</td>'+
+        '</tr>';
+    });
+    // analysis (read currently-rendered list)
+    var anaHTML='';
+    var anaBox=document.getElementById('t-analysis');
+    if(anaBox && anaBox.style.display!=='none'){
+      var items=Array.prototype.slice.call(document.querySelectorAll('#t-analysis-list li')).map(function(li){return '<li>'+li.textContent+'</li>';}).join('');
+      if(items) anaHTML='<h2>패턴 분석</h2><ul class="pana">'+items+'</ul>';
+    }
+    // recommendations (read currently-rendered cards, including link URLs)
+    var recoHTML='';
+    var recoBox=document.getElementById('t-reco');
+    if(recoBox && recoBox.style.display!=='none'){
+      var cards=Array.prototype.slice.call(document.querySelectorAll('#t-reco-list .reco-item')).map(function(it){
+        var t=it.querySelector('.r-title')?it.querySelector('.r-title').textContent.trim():'';
+        var b=it.querySelector('.r-body')?it.querySelector('.r-body').textContent.trim():'';
+        var a=it.querySelector('.r-link');
+        var url=a?a.getAttribute('href'):'';
+        var lbl=a?a.textContent.trim():'';
+        return '<div class="prec"><div class="prec-t">'+t+'</div><div class="prec-b">'+b+'</div>'+
+          (url?'<div class="prec-l">'+lbl+': '+url+'</div>':'')+'</div>';
+      }).join('');
+      if(cards) recoHTML='<h2>이렇게 해보세요</h2>'+cards;
+    }
+    return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>수면일기 요약</title>'+
+      '<style>'+
+      '*{margin:0;padding:0;box-sizing:border-box;}'+
+      'body{font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;color:#1a2332;padding:32px 28px;line-height:1.5;}'+
+      'h1{font-size:20px;font-weight:700;margin-bottom:2px;}'+
+      '.clinic{font-size:13px;font-weight:700;color:#1e3a5f;letter-spacing:0.2px;margin-bottom:3px;}'+
+      '.clinic-sub{font-size:11px;color:#5a6675;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid #1e3a5f;}'+
+      '.meta{font-size:12px;color:#888;margin-bottom:20px;}'+
+      '.psum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}'+
+      '.psum div{border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px;font-size:11px;color:#5a6675;}'+
+      '.psum span{display:block;font-size:18px;font-weight:700;color:#1a2332;margin-bottom:2px;}'+
+      'h2{font-size:14px;font-weight:600;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #1e3a5f;}'+
+      'table{width:100%;border-collapse:collapse;font-size:11px;}'+
+      'th,td{border:1px solid #dfe3e8;padding:6px 5px;text-align:center;}'+
+      'th{background:#f5f7fa;font-weight:600;color:#5a6675;font-size:10px;}'+
+      'td.se{font-weight:700;}'+
+      '.pana{margin:6px 0 0 0;padding-left:18px;font-size:12px;color:#333;}'+
+      '.pana li{margin-bottom:5px;}'+
+      '.prec{border:1px solid #f0ddc8;border-left:3px solid #d88a3c;border-radius:6px;padding:11px 13px;margin-bottom:9px;background:#fffaf4;}'+
+      '.prec-t{font-size:12.5px;font-weight:700;color:#1a2332;margin-bottom:4px;}'+
+      '.prec-b{font-size:11.5px;color:#444;line-height:1.55;}'+
+      '.prec-l{font-size:10.5px;color:#b05a1e;margin-top:7px;word-break:break-all;}'+
+      '.foot{margin-top:20px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;}'+
+      '.foot b{color:#5a6675;font-weight:600;}'+
+      '@media print{body{padding:0;}@page{margin:1.5cm;}.prec{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'+
+      '</style></head><body>'+
+      '<div class="clinic">YD 정신건강의학과</div>'+
+      '<div class="clinic-sub">YD 퍼포먼스 인지행동치료 센터</div>'+
+      '<h1>수면일기 요약</h1>'+
+      '<div class="meta">출력일: '+today+(n?' · 기록 '+n+'일':'')+'</div>'+
+      statsHTML+
+      (n?'<h2>일자별 기록</h2><table><thead><tr><th>날짜</th><th>누운<br>시각</th><th>잠든<br>시각</th><th>기상</th><th>침대<br>나옴</th><th>총수면</th><th>수면<br>효율</th><th>야간<br>각성</th><th>각성 상세</th><th>컨디션</th></tr></thead><tbody>'+rowsHTML+'</tbody></table>':'<p style="color:#888;font-size:13px;">기록이 없습니다.</p>')+
+      anaHTML+
+      recoHTML+
+      '<div class="foot"><b>YD 정신건강의학과 · YD 퍼포먼스 인지행동치료 센터</b><br>본 자료는 환자 자가보고에 기반한 수면일기이며, 임상적 판단을 대신하지 않습니다. 무단 복제·배포를 금합니다.</div>'+
+      '</body></html>';
+  }
+
+  document.getElementById('r-print').addEventListener('click',function(){
+    if(!entries.length){ toast('출력할 기록이 없습니다'); return; }
+    var w=window.open('','_blank');
+    if(!w){ toast('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하세요'); return; }
+    w.document.open();
+    w.document.write(buildPrintHTML());
+    w.document.close();
+    // give the new window a moment to render, then trigger print
+    setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} },350);
+  });
+
+  var clearArmed=false, clearTimer=null;
+  (function(){
+    var btn=document.getElementById('r-clear');
+    var label='전체 기록 삭제';
+    function reset(){
+      clearArmed=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>'+label;
+      btn.style.background='transparent';
+      btn.style.color='var(--bad)';
+    }
+    btn.addEventListener('click',function(){
+      if(!entries.length){ toast('삭제할 기록이 없습니다'); return; }
+      if(!clearArmed){
+        clearArmed=true;
+        btn.innerHTML='정말 삭제하려면 한 번 더 누르세요';
+        btn.style.background='var(--bad)';
+        btn.style.color='#fff';
+        clearTimeout(clearTimer);
+        clearTimer=setTimeout(reset,3500);
+      } else {
+        clearTimeout(clearTimer);
+        entries=[]; save(); renderAll(); reset();
+        toast('전체 기록을 삭제했습니다');
+      }
+    });
+  })();
+
+  // ---- toast ----
+  var tTimer;
+  function toast(msg){
+    var t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(tTimer); tTimer=setTimeout(function(){t.classList.remove('show');},2200);
+  }
+
+  function renderAll(){ renderStats(); renderTimeline(); renderAnalysis(); renderRecommendations(); renderLog(); if(document.getElementById('view-trends').classList.contains('active')) renderChart(); }
+  renderAll();
+})();
+
+/* ===== 홈 화면에 설치하기 =====
+   반디 앱과 같은 방식이다. 카톡으로 링크를 받으면 카톡 안의 브라우저로
+   열리는데, 거기서는 설치가 안 된다. 그래서 밖으로 나가라고 먼저 알린다. */
+(function(){
+  "use strict";
+  var INSTALL_HINT_KEY = 'sleep_diary_install_hint';
+  var deferredInstall = null;
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferredInstall = e; updateInstallBar();
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredInstall = null; updateInstallBar();
+  });
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+  function inAppBrowser(){
+    return /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps/i.test(navigator.userAgent);
+  }
+  function isKakao(){ return /KAKAOTALK/i.test(navigator.userAgent); }
+
+  function updateInstallBar(){
+    var bar = document.getElementById('installBar');
+    var text = document.getElementById('installText');
+    var action = document.getElementById('installAction');
+    if(!bar) return;
+    var ua = navigator.userAgent;
+    var isAndroid = /Android/i.test(ua);
+    var isIOS = /iPad|iPhone|iPod/i.test(ua);
+
+    bar.classList.remove('show');
+    if(isStandalone()) return;
+
+    if(inAppBrowser()){
+      var where = isKakao() ? '카톡' : '앱';
+      text.textContent = isAndroid
+        ? '지금은 ' + where + ' 안의 브라우저로 열려 있어요.\n크롬으로 열어야 홈 화면에 둘 수 있어요.'
+        : '지금은 ' + where + ' 안의 브라우저로 열려 있어요.\n오른쪽 아래 버튼을 눌러 사파리로 열어주세요.';
+      action.textContent = '크롬으로 열기';
+      action.style.display = isAndroid ? '' : 'none';
+      bar.classList.add('show');
+      return;
+    }
+
+    // 앱 안 브라우저 안내는 늘 띄우지만, 설치 권유는 한 번 닫으면 그만 띄운다
+    try { if(localStorage.getItem(INSTALL_HINT_KEY) === 'off') return; } catch(e){ return; }
+
+    if(deferredInstall){
+      text.textContent = '홈 화면에 두면 인터넷이 없어도 열려요.';
+      action.textContent = '홈 화면에 설치';
+      action.style.display = '';
+      bar.classList.add('show');
+      return;
+    }
+    if(isIOS){
+      // 아이폰은 사파리와 홈 화면 앱의 저장 공간이 따로일 수 있다.
+      // 먼저 기록하고 나중에 설치하면 앱이 비어 보일 수 있어 순서를 알려준다.
+      text.textContent = '홈 화면에 두면 인터넷이 없어도 열려요.\n아래 공유 버튼을 눌러 "홈 화면에 추가"를 골라주세요.\n기록은 홈 화면 아이콘으로 연 다음에 시작해주세요.';
+      action.style.display = 'none';
+      bar.classList.add('show');
+    }
+  }
+
+  document.getElementById('installAction').addEventListener('click', function(){
+    if(inAppBrowser()){
+      var bare = location.href.replace(/^https?:\/\//, '');
+      location.href = 'intent://' + bare + '#Intent;scheme=https;package=com.android.chrome;end';
+      return;
+    }
+    if(!deferredInstall) return;
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function(){ deferredInstall = null; updateInstallBar(); });
+  });
+
+  document.getElementById('installClose').addEventListener('click', function(){
+    // 앱 안 브라우저 안내는 닫아도 다음에 또 뜬다. 거기선 설치가 아예 안 되니까.
+    if(!inAppBrowser()){ try { localStorage.setItem(INSTALL_HINT_KEY, 'off'); } catch(e){} }
+    document.getElementById('installBar').classList.remove('show');
+  });
+
+  updateInstallBar();
+
+  if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
