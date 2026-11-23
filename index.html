@@ -176,6 +176,13 @@
   .freq-txt{font-size:13px;color:var(--ink-soft);line-height:1.4;}
   .freq-txt em{font-style:normal;color:var(--ink-faint);font-size:11.5px;}
 
+  /* Sleep hygiene guide (수면위생 탭) */
+  .hyg-list{list-style:none;counter-reset:hy;}
+  .hyg-list li{counter-increment:hy;position:relative;padding:12px 4px 12px 40px;font-size:14.5px;line-height:1.55;color:var(--ink);border-bottom:1px solid var(--line-soft);}
+  .hyg-list li:last-child{border-bottom:none;}
+  .hyg-list li::before{content:counter(hy);position:absolute;left:0;top:11px;width:26px;height:26px;border-radius:50%;background:var(--sleep-soft);color:var(--night);font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .hyg-list li em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
+
   /* Primary button */
   .btn{
     width:100%;border:none;border-radius:var(--radius-sm);padding:15px;
@@ -302,6 +309,9 @@
     <button data-view="trends">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>추이
     </button>
+    <button data-view="hygiene">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>수면위생
+    </button>
   </div>
   <!-- 설치 안내. 기록/추이 어느 탭에서도 보이도록 탭 바로 아래에 둔다 -->
   <div class="install-bar" id="installBar">
@@ -381,6 +391,36 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
       기록 저장하기
     </button>
+  </div>
+
+  <!-- SLEEP HYGIENE VIEW
+       기록하는 곳이 아니라 수시로 펴 보는 안내 페이지다.
+       문구는 두뇌 「불면증 처방전 1」(수면위생 지침 14개)을 순서·번호 그대로 옮겼다.
+       진료 때 "처방전 몇 번"으로 말할 수 있게 번호를 바꾸지 않는다. -->
+  <div class="view" id="view-hygiene">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+        수면위생 지침
+      </div>
+      <div class="card-sub">잠을 돕는 생활 습관 14가지예요. 하루에 다 지키려고 애쓰지 않아도 괜찮아요. 수시로 열어 보면서 할 수 있는 것부터 해 보세요.</div>
+      <ol class="hyg-list">
+        <li>아침에 개운함을 느끼는 데 필요한 만큼만 자기</li>
+        <li>잠들려고 애쓰지 않기</li>
+        <li>매일 같은 시간에 일어나기</li>
+        <li>규칙적으로 운동하기</li>
+        <li>침실은 편안하고 어둡고 조용하게</li>
+        <li>너무 배고픈 채로, 또는 너무 배부른 채로 잠자리에 들지 않기 <em>간단한 간식은 괜찮아요</em></li>
+        <li>밤에 침실 온도를 알맞게 유지하기</li>
+        <li>저녁에 물을 너무 많이 마시지 않기</li>
+        <li>카페인(커피·차·콜라·초콜릿·에너지 드링크) 줄이기 <em>낮에도 줄여요</em></li>
+        <li>저녁에 술·담배 하지 않기</li>
+        <li>고민거리를 침대까지 가져가지 않기</li>
+        <li>시계는 치우거나 보이지 않게 두기</li>
+        <li>낮잠 자지 않기 <em>꼭 자야 한다면 오후 3시 전, 30분 이내로</em></li>
+        <li>낮에 햇볕을 충분히 쬐기</li>
+      </ol>
+    </div>
   </div>
 
   <!-- TRENDS VIEW -->
