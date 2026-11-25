@@ -286,10 +286,15 @@
   .th-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
   .th-chips span{border:1.5px solid var(--line);border-radius:20px;padding:6px 11px;font-size:13px;color:var(--ink-soft);cursor:pointer;background:var(--paper);-webkit-tap-highlight-color:transparent;}
   .th-chips span.on{border-color:var(--night-2);background:var(--sleep-soft);color:var(--night);font-weight:600;}
-  .th-chips span.star::after{content:" ★";color:#c9a227;font-size:11px;}
   .th-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .th-opt{border:1.5px dashed var(--line);border-radius:var(--radius-sm);padding:0 12px;margin-bottom:12px;}
   .th-opt summary{font-size:13px;color:var(--ink-soft);padding:11px 0;cursor:pointer;}
+  .th-help{margin:0 0 10px;}
+  .th-help summary{font-size:12.5px;color:var(--night-2);font-weight:600;padding:4px 0 8px;cursor:pointer;}
+  .th-err{border-top:1px solid var(--line-soft);padding:9px 2px;}
+  .th-err b{display:block;font-size:13.5px;color:var(--ink);}
+  .th-err p{font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin-top:2px;}
+  .th-err q{display:block;font-size:12.5px;color:var(--night);margin-top:3px;quotes:none;}
   .th-rec{border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:12px 13px;margin-bottom:10px;}
   .th-rec .top{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-faint);}
   .th-rec .top .x{cursor:pointer;font-size:17px;line-height:1;color:var(--ink-faint);padding:0 4px;}
@@ -1735,18 +1740,32 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) mpHoldAll
 /* =========================================================
    생각바꾸기 탭 (2026-11-25, 선생님 지시)
    두뇌 CBT도구\불면_CBT_5회기.html 3회기 ④·4회기에서 줄여 옮김.
-   감정 8가지 · 인지오류 11가지(★ = 불면 슬라이드의 다섯 가지)는 센터 Face 양식 그대로.
+   감정 8가지 · 인지오류 11가지는 센터 Face 양식 그대로 (별 표시 없음 — 선생님 결정 2026-11-25).
    ========================================================= */
 (function(){
   var KEY='sleepDiary.thought.v1', DKEY='sleepDiary.thought.draft';
   var EMO=['공포','분노','불안','실망','좌절','우울','짜증','기타'];
-  var ERR=['흑백논리의 오류','재앙화','명명하기','과대평가/과소평가','감정적 추론','정신적 여과','독심술의 오류','지나친 일반화','자기 탓','당위진술','터널시야'];
-  var STAR=['재앙화','당위진술','흑백논리의 오류','지나친 일반화','정신적 여과'];
+  // 인지오류 11가지 [이름, 설명, 잠 예시] — 불면 도구 3회기 ③(ERR_ALL)과 같은 문구. 한쪽을 고치면 다른 쪽도
+  var ERR_ALL=[
+  ['흑백논리의 오류','그 사이의 여러 단계를 보지 않고 둘 중 하나로만 나눠요.','"7시간 못 자면 잠을 못 잔 것과 다름없어."'],
+  ['재앙화','앞날을 현실적인 고려 없이 최악으로 예상하고, 꼬리에 꼬리를 물어 더 나쁜 장면을 떠올려요.','"이러다 평생 잠을 제대로 못 자게 될 거야."'],
+  ['명명하기','나나 다른 사람, 상황에 고정되고 부정적인 이름(딱지)을 붙여요.','"잠 하나 마음대로 못 하는 나는 한심한 사람이야."'],
+  ['과대평가/과소평가','나쁜 쪽은 크게, 좋은 쪽은 작게 봐요.','몇 시간은 잤는데도 "결국 한숨도 못 잤네."'],
+  ['감정적 추론','근거보다 그 순간의 느낌으로 결론을 내려요.','"이렇게 불안한 걸 보니 오늘 밤도 못 잘 게 분명해."'],
+  ['정신적 여과','좋거나 중립적인 정보는 걸러 버리고 나쁜 정보에만 집중해요.','지난주 잘 잔 날은 빼고 못 잔 날만 떠올리며 "나는 항상 못 자."'],
+  ['독심술의 오류','뚜렷한 근거 없이 다른 사람의 속마음을 안다고 여겨요.','"회의 때 하품하는 걸 보고 다들 내가 게으르다고 생각했을 거야."'],
+  ['지나친 일반화','한두 번의 일을 근거로 전체를 부정적으로 결론 내려요.','"어제도 못 잤으니 내일도, 모레도 못 잘 거야."'],
+  ['자기 탓','뚜렷한 근거 없이 다른 사람의 불편이나 부정적인 일을 내 탓으로 돌려요.','"남편이 피곤해 보이는 건 내가 밤새 뒤척여서 깨웠기 때문이야."'],
+  ['당위진술','"반드시 ~해야 한다", "~하면 안 된다"처럼 고정되고 비현실적인 기준을 세워요.','"나는 반드시 7시간은 자야 한다."'],
+  ['터널시야','상황의 다른 면은 보지 않고 나쁜 쪽만 봐요.','"오늘 짜증 나고 일이 안 풀린 건 다 어젯밤 잠 때문이야."']
+  ];
+  var ERR=ERR_ALL.map(function(e){ return e[0]; });
   function load(k,d){ try{ var o=JSON.parse(localStorage.getItem(k)); return o||d; }catch(e){ return d; } }
   function put(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ if(window.sdToast) sdToast('저장 공간이 부족합니다'); return false; } }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function today(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
   var D=load(DKEY,{});
+  var helpOpen=false;
   function saveDraft(){ put(DKEY,D); }
   function opt(vals,cur,first,suf){ return '<option value="">'+first+'</option>'+vals.map(function(v){ return '<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+v+(suf||'')+'</option>'; }).join(''); }
   var N10=[1,2,3,4,5,6,7,8,9,10], P10=[0,10,20,30,40,50,60,70,80,90,100];
@@ -1763,8 +1782,11 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) mpHoldAll
       '<select data-k="emoS">'+opt(N10,D.emoS,'정도')+'</select></div>'+
     '<div class="field"><label>자동사고 — 그때 저절로 떠오른 생각</label>'+inp('auto','예: 오늘 못 자면 내일 회의를 망칠 거야')+'</div>'+
     '<div class="field"><label>이 생각을 믿는 정도 (%)</label><select data-k="bel">'+opt(P10.slice(1),D.bel,'-','%')+'</select></div>'+
-    '<details class="th-opt"'+(err.length?' open':'')+'><summary>인지오류 고르기 (선택 · ★ 는 불면에서 흔한 것)</summary>'+
-      '<div class="th-chips" data-pick="err">'+ERR.map(function(x){return '<span class="'+(STAR.indexOf(x)>=0?'star ':'')+(err.indexOf(x)>=0?'on':'')+'" data-v="'+x+'">'+x+'</span>';}).join('')+'</div></details>'+
+    '<details class="th-opt"'+(err.length?' open':'')+'><summary>인지오류 고르기 (선택 · 해당하는 것 모두)</summary>'+
+      '<div class="th-chips" data-pick="err">'+ERR.map(function(x){return '<span class="'+(err.indexOf(x)>=0?'on':'')+'" data-v="'+x+'">'+x+'</span>';}).join('')+'</div>'+
+      '<details class="th-help"'+(helpOpen?' open':'')+'><summary>11가지가 무슨 뜻인지 보기</summary>'+
+        ERR_ALL.map(function(e){ return '<div class="th-err"><b>'+e[0]+'</b><p>'+e[1]+'</p><q>'+e[2]+'</q></div>'; }).join('')+
+      '</details></details>'+
     '<div class="th-step">② 생각 바꾸기</div>'+
     '<div class="field"><label>증거 찾기</label><div class="th-hint">이전 경험, 이미 확인된 사실, 내가 놓치고 있는 긍정적·중립적 사실을 찾아요. 사소한 증거라도 무시하지 않아요.</div>'+
       ta('for','맞다는 증거')+'<div style="height:8px"></div>'+ta('against','틀리다는 증거')+'</div>'+
@@ -1799,6 +1821,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) mpHoldAll
       el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){ D[el.dataset.k]=el.value; saveDraft();
         if(el.tagName==='SELECT' && (el.dataset.k==='emoS'||el.dataset.k==='bel')) render(); });
     });
+    var hp=f.querySelector('.th-help'); if(hp) hp.addEventListener('toggle',function(){ helpOpen=hp.open; });
     f.querySelectorAll('[data-pick] span').forEach(function(sp){
       sp.addEventListener('click',function(){ var k=sp.parentNode.dataset.pick, v=sp.dataset.v;
         if(k==='emo') D.emo=(D.emo===v?'':v);
