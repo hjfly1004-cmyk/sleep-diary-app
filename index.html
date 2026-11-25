@@ -183,6 +183,30 @@
   .hyg-list li::before{content:counter(hy);position:absolute;left:0;top:11px;width:26px;height:26px;border-radius:50%;background:var(--sleep-soft);color:var(--night);font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;}
   .hyg-list li em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
 
+  /* Sleep prescription (수면처방 탭) */
+  .rx-big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:4px 0 12px;}
+  .rx-big div{background:var(--sleep-soft);border-radius:var(--radius-sm);padding:12px 6px;text-align:center;}
+  .rx-big b{display:block;font-size:21px;font-weight:700;color:var(--night);letter-spacing:-0.3px;}
+  .rx-big b.s{font-size:14px;line-height:31px;white-space:nowrap;letter-spacing:-0.5px;}
+  .rx-big span{display:block;font-size:11px;color:var(--ink-soft);margin-top:2px;line-height:1.35;}
+  .rx-meta{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+  .rx-check{border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;}
+  .rx-check .h{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .rx-badge{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px;}
+  .rx-badge.up{background:var(--good-bg);color:var(--good);}
+  .rx-badge.same{background:var(--sleep-soft);color:var(--night-2);}
+  .rx-badge.down{background:var(--bad-bg);color:var(--bad);}
+  .rx-note{background:var(--mid-bg);border-radius:var(--radius-sm);padding:11px 13px;font-size:13px;line-height:1.6;margin:10px 0;}
+  .rx-info{background:var(--canvas);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;line-height:1.6;color:var(--ink-soft);margin-top:12px;}
+  .rx-form .grid2{margin-bottom:12px;}
+  .rx-hist{list-style:none;margin-top:12px;border-top:1px solid var(--line-soft);}
+  .rx-hist li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:8px 2px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);}
+  .rx-hist li b{color:var(--ink);font-weight:600;}
+  .rx-link{background:none;border:none;color:var(--night-2);font-size:12.5px;text-decoration:underline;cursor:pointer;font-family:inherit;padding:8px 0 0;}
+  .rx-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .rx-chips span{font-size:12.5px;background:var(--canvas);border:1px solid var(--line);border-radius:20px;padding:5px 11px;color:var(--ink);}
+  .rx-sub{font-size:13.5px;font-weight:600;margin:16px 0 4px;color:var(--ink);}
+
   /* Mindfulness (마음챙김 탭) — 재생기 모양은 불면 CBT 5회기 도구와 같다 */
   #view-mind{--acc:var(--night-2);--sub:var(--ink-soft);--faint:var(--ink-faint);--line2:var(--line-soft);}
   .mind-key{background:var(--night);color:#fff;border-radius:var(--radius);padding:18px 18px 16px;margin-bottom:16px;font-size:14px;line-height:1.7;}
@@ -246,8 +270,33 @@
   @keyframes spl{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
   @media (max-width:480px){
     .modes{gap:4px;}
-    .modes button{flex-direction:column;gap:3px;padding:8px 2px;font-size:12.5px;}
+    .modes button{flex-direction:column;gap:3px;padding:8px 1px;font-size:12px;letter-spacing:-0.4px;}
   }
+
+  /* 생각바꾸기 탭 */
+  #view-think input[type=text],#view-think textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-size:14.5px;font-family:inherit;color:var(--ink);background:var(--paper);-webkit-appearance:none;}
+  #view-think textarea{min-height:64px;resize:vertical;line-height:1.55;}
+  #view-think input[type=text]:focus,#view-think textarea:focus{outline:none;border-color:var(--night-2);}
+  #view-think select{padding:10px 12px;font-size:14px;}
+  .th-step{font-size:12px;font-weight:700;color:var(--night-2);margin:22px 0 10px;padding-top:14px;border-top:1px solid var(--line-soft);}
+  .th-step:first-of-type{margin-top:0;padding-top:0;border-top:none;}
+  .th-hint{font-size:12px;color:var(--ink-faint);line-height:1.55;margin:-3px 0 8px;}
+  .th-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .th-chips span{border:1.5px solid var(--line);border-radius:20px;padding:6px 11px;font-size:13px;color:var(--ink-soft);cursor:pointer;background:var(--paper);-webkit-tap-highlight-color:transparent;}
+  .th-chips span.on{border-color:var(--night-2);background:var(--sleep-soft);color:var(--night);font-weight:600;}
+  .th-chips span.star::after{content:" ★";color:#c9a227;font-size:11px;}
+  .th-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .th-opt{border:1.5px dashed var(--line);border-radius:var(--radius-sm);padding:0 12px;margin-bottom:12px;}
+  .th-opt summary{font-size:13px;color:var(--ink-soft);padding:11px 0;cursor:pointer;}
+  .th-rec{border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:12px 13px;margin-bottom:10px;}
+  .th-rec .top{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-faint);}
+  .th-rec .top .x{cursor:pointer;font-size:17px;line-height:1;color:var(--ink-faint);padding:0 4px;}
+  .th-rec .a{font-size:14px;color:var(--ink);margin-top:5px;}
+  .th-rec .r{font-size:14px;color:var(--night);font-weight:600;margin-top:4px;}
+  .th-rec .m{font-size:12px;color:var(--ink-soft);margin-top:5px;}
+  .th-rec details{margin-top:6px;font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+  .th-rec details summary{cursor:pointer;color:var(--night-2);}
+  .th-rec details b{color:var(--ink);font-weight:600;}
 
   /* Primary button */
   .btn{
@@ -266,6 +315,8 @@
   /* Stats */
   .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
   .stat{background:var(--paper);border-radius:var(--radius-sm);padding:15px;box-shadow:var(--shadow);}
+  .stats-h{grid-column:1/-1;font-size:12.5px;color:var(--ink-soft);margin-bottom:-3px;}
+  .stats-h b{color:var(--night);font-weight:700;}
   .stat .lab{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
   .stat .num{font-size:25px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
   .stat .tag{font-size:11px;margin-top:4px;font-weight:500;}
@@ -306,6 +357,12 @@
   .analysis ul{list-style:none;margin-top:6px;}
   .analysis li{font-size:13.5px;color:#2c4a6e;line-height:1.7;padding-left:18px;position:relative;margin-bottom:7px;}
   .analysis li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--night-2);}
+  .analysis .card-sub{margin:-2px 0 8px;}
+  .analysis li b.ana-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--night);background:#fff;border:1px solid #d8e4f2;border-radius:10px;padding:0 8px;margin-right:6px;line-height:18px;}
+  .analysis li .ana-how{display:block;color:var(--ink);margin-top:2px;}
+  .analysis li a.ana-go{color:var(--night-2);font-weight:600;}
+  .analysis .r-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;font-weight:600;color:#fff;background:var(--night);padding:8px 13px;border-radius:8px;text-decoration:none;}
+  .analysis .r-link svg{width:14px;height:14px;}
   .analysis .disc{font-size:11px;color:var(--ink-faint);margin-top:12px;font-style:normal;}
 
   /* Recommendations */
@@ -376,7 +433,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>추이
     </button>
     <button data-view="hygiene">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>수면위생
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>수면처방
+    </button>
+    <button data-view="think">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg>생각바꾸기
     </button>
     <button data-view="mind">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h11a3 3 0 10-3-3M3 12h15a3 3 0 11-3 3M3 16h7"/></svg>마음챙김
@@ -467,6 +527,34 @@
        문구는 두뇌 「불면증 처방전 1」(수면위생 지침 14개)을 순서·번호 그대로 옮겼다.
        진료 때 "처방전 몇 번"으로 말할 수 있게 번호를 바꾸지 않는다. -->
   <div class="view" id="view-hygiene">
+    <!-- 수면제한 (2026-11-24, 선생님 지시) — 5회기가 끝난 뒤 혼자 매주 눕는 시각을 조정하게 한다.
+         규칙은 두뇌 CBT도구\불면_CBT_5회기.html의 adjust()와 같다(85·80%, 15분, 침대 시간 최소 5시간).
+         선생님이 정한 처방을 적어야 켜진다(앱만 깐 사람이 혼자 수면제한을 시작하지 않게). -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        수면제한 — 이번 주 내 처방
+      </div>
+      <div id="rx-box"></div>
+    </div>
+    <!-- 자극조절 — 불면증 처방전 2 / 2회기 슬라이드 13. 불면 도구 2회기 ③과 같은 문구 -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a3 3 0 013-3h12a3 3 0 013 3v6M3 18h18M3 14h18M7 9V6h4v3"/></svg>
+        자극조절 — 침대 = 잠
+      </div>
+      <div class="card-sub">침실을 다시 졸림 · 나른함 · 잠과 짝지어 주는 방법이에요. 수면제한과 함께 해요.</div>
+      <ol class="hyg-list">
+        <li>졸릴 때만 침실에 눕기</li>
+        <li>잠자는 것 말고 다른 행동은 침실에서 하지 않기</li>
+        <li>누웠는데 15분 안에 잠이 오지 않으면 침실 밖으로 나가기 <em>시계는 보지 않고, 잠이 안 온다는 느낌으로</em></li>
+        <li>졸음이 다시 올 때만 침실로 돌아오기</li>
+        <li>몇 시간을 잤든 매일 같은 시간에 일어나기</li>
+      </ol>
+      <div class="rx-sub">침실 밖으로 나가면?</div>
+      <div class="rx-chips"><span>가벼운 독서</span><span>부드러운 음악</span><span>단순한 작업 (뜨개질, 퍼즐)</span><span>이완훈련 (복식호흡, 마음챙김)</span><span>간접 조명 (독서등·무드등 O, 형광등 X)</span><span>TV·휴대폰 같은 블루라이트는 피하기</span><span>카페인·간식은 먹지 않기</span></div>
+      <div class="rx-info"><b>밤에 소변 때문에 깬다면</b> 화장실에 다녀온 뒤 바로 침실로 돌아와요(집 안을 돌아다니지 않기). 그 뒤에도 계속 잠이 안 오면 자극조절을 써요.</div>
+    </div>
     <div class="card">
       <div class="card-title">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
@@ -489,6 +577,27 @@
         <li>낮잠 자지 않기 <em>꼭 자야 한다면 오후 3시 전, 30분 이내로</em></li>
         <li>낮에 햇볕을 충분히 쬐기</li>
       </ol>
+    </div>
+  </div>
+
+  <!-- THINK VIEW (2026-11-25, 선생님 지시)
+       5회기가 끝난 뒤 혼자 연습하며 간단히 적어 보는 생각 바꾸기. 칸·문구는 두뇌 CBT도구\불면_CBT_5회기.html
+       3회기 ④ 자동사고 기록과 4회기 STEP 1~3 · 합리적 생각을 줄여 옮김. 기록은 sleepDiary.thought.v1 (이 휴대폰에만). -->
+  <div class="view" id="view-think">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        생각 바꾸기 — 적어 보기
+      </div>
+      <div class="card-sub">잠 때문에 불안하거나 속상했던 순간을, 3·4회기에서 배운 순서대로 간단히 적어 봐요. 다 채우지 않아도 괜찮아요.</div>
+      <div id="th-form"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h6"/></svg>
+        내가 적은 것
+      </div>
+      <div id="th-list"></div>
     </div>
   </div>
 
@@ -561,17 +670,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
         패턴 분석
       </div>
+      <div class="card-sub">최근 7일 기록을 보고, 5회기 동안 배운 것 중 지금 써 볼 것을 알려 줘요.</div>
       <ul id="t-analysis-list"></ul>
       <div class="disc">※ 임상적 판단을 대신하지 않습니다. 진료 시 참고용으로 활용하세요.</div>
-    </div>
-
-    <div class="reco" id="t-reco" style="display:none;">
-      <div class="reco-head">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg>
-        <span>이렇게 해보세요</span>
-      </div>
-      <div id="t-reco-list"></div>
-      <div class="reco-foot">상기 안내는 기록된 패턴을 바탕으로 한 일반적 제안입니다. 정확한 평가와 치료는 진료를 통해 이루어집니다.</div>
     </div>
 
     <div class="card">
@@ -657,6 +758,9 @@
     var sol=span(e.bedin,e.asleep);
     return {tib:tib,tst:tst,se:se,sol:sol};
   }
+  // 수면처방 탭(아래 별도 script)이 같은 계산을 쓴다
+  window.sdCalc=calc;
+  window.sdEntries=function(){ return entries; };
 
   // ---- condition pills ----
   document.querySelectorAll('#f-cond button').forEach(function(b){
@@ -772,6 +876,8 @@
       document.getElementById('view-'+b.dataset.view).classList.add('active');
       if(b.dataset.view==='trends') renderChart();
       if(b.dataset.view!=='mind' && window.mpHoldAll) mpHoldAll();
+      if(b.dataset.view==='hygiene' && window.rxRender) rxRender();
+      if(b.dataset.view==='think' && window.thRender) thRender();
     });
   });
 
@@ -779,21 +885,27 @@
   function condLabel(c){ return c===1?'나쁘다':c===3?'좋다':'보통'; }
 
   // ---- stats ----
+  // 숫자 4칸은 최근 7일 평균 (2026-11-25, 선생님 결정) — 회기마다 지난 1주를 불면 도구에 옮겨 적고,
+  // 수면처방 탭·패턴 분석과 같은 기간. 기록이 7일보다 적어도 있는 날만으로 평균을 낸다(2회기 첫 처방용).
+  function md7(str){ return (+str.slice(5,7))+'/'+(+str.slice(8,10)); }
   function renderStats(){
     var box=document.getElementById('t-stats');
     if(!entries.length){ box.innerHTML=''; return; }
-    var n=entries.length;
-    var aSe=Math.round(entries.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
-    var aTst=entries.reduce(function(a,e){return a+calc(e).tst;},0)/n;
-    var aSol=Math.round(entries.reduce(function(a,e){return a+calc(e).sol;},0)/n);
+    var t=new Date(), to=ymdL(t); t.setDate(t.getDate()-6); var from=ymdL(t);
+    var es=recentEntries(), n=es.length;
+    var head='<div class="stats-h"><b>최근 7일</b> ('+md7(from)+' ~ '+md7(to)+' 아침 기록)</div>';
+    if(!n){ box.innerHTML=head+'<div class="stats-h" style="margin:4px 0 0">최근 7일 기록이 없어요. 오늘 아침 기록부터 다시 적어 보세요.</div>'; return; }
+    var aSe=Math.round(es.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
+    var aTst=es.reduce(function(a,e){return a+calc(e).tst;},0)/n;
+    var aSol=Math.round(es.reduce(function(a,e){return a+calc(e).sol;},0)/n);
     function st(lab,num,tag,cls){
       return '<div class="stat"><div class="lab">'+lab+'</div><div class="num">'+num+'</div>'+(tag?'<div class="tag '+cls+'">'+tag+'</div>':'')+'</div>';
     }
-    box.innerHTML=
+    box.innerHTML=head+
       st('평균 수면효율',aSe+'%',aSe>=85?'양호':'효율 떨어짐',aSe>=85?'ok':'warn')+
       st('평균 총수면',fmtDur(aTst),'','')+
       st('평균 입면시간',aSol+'분',aSol>30?'다소 김':'정상',aSol>30?'warn':'ok')+
-      st('기록 일수',n+'일','','');
+      st('기록 일수',n+' / 7일','','');
   }
 
   // ---- timeline ----
@@ -910,162 +1022,96 @@
     });
   }
 
-  // ---- analysis ----
-  function renderAnalysis(){
-    var box=document.getElementById('t-analysis');
-    if(entries.length<3){ box.style.display='none'; return; }
-    box.style.display='block';
-    var n=entries.length;
-    var aSe=entries.reduce(function(a,e){return a+calc(e).se;},0)/n;
-    var aSol=entries.reduce(function(a,e){return a+calc(e).sol;},0)/n;
-    var aWaso=entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n;
-    var ses=entries.map(function(e){return calc(e).se;});
-    var sd=Math.round(Math.sqrt(ses.reduce(function(a,v){return a+Math.pow(v-aSe,2);},0)/ses.length)*10)/10;
-    var bedins=entries.map(function(e){return toMin(e.bedin);}).filter(function(v){return v!=null;});
-    // normalize around midnight: evening hours (>=18:00) treated on a continuous scale
-    // so 23:00 and 01:00 are 2h apart, not 22h. Anchor: shift <12:00 by +24h.
-    var bedinsNorm=bedins.map(function(m){ return m<12*60 ? m+1440 : m; });
-    var spread=bedins.length>1?Math.round(Math.max.apply(null,bedinsNorm)-Math.min.apply(null,bedinsNorm)):0;
-
-    // gather all timed wake events
-    var allWakes=[];
-    entries.forEach(function(e){ (e.wakes||[]).forEach(function(w){ if(w.time) allWakes.push(w); }); });
-    var nightsWithWake=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time||w.dur>0;})||isFreq(e);}).length;
-    var freqNights=entries.filter(isFreq).length;
-
-    var L=[];
-    if(aSe>=85) L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 양호한 수준입니다.');
-    else if(aSe>=80) L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 경계선에 있습니다. 수면 제한 요법으로 개선 여지가 있습니다.');
-    else L.push('평균 수면효율 '+Math.round(aSe*10)/10+'%로 낮은 편입니다. CBT-I의 수면 제한·자극 조절이 도움이 될 수 있습니다.');
-    if(aSol>30) L.push('평균 입면시간이 '+Math.round(aSol)+'분으로, 잠들기까지 시간이 다소 깁니다.');
-
-    // wake frequency + timing analysis
-    if(freqNights>0) L.push('하룻밤에 4회 이상 자주 깬 날이 '+freqNights+'/'+n+'일 있습니다 — 수면 분절이 심한 편으로, 깊은 수면 유지에 어려움이 시사됩니다.');
-    if(aWaso>30) L.push('야간 각성이 평균 '+Math.round(aWaso)+'분으로 수면 유지의 어려움이 관찰됩니다 ('+nightsWithWake+'/'+n+'일 발생).');
-    else if(nightsWithWake>0) L.push('야간 각성이 '+nightsWithWake+'/'+n+'일 기록되었습니다'+(aWaso>0?' (평균 '+Math.round(aWaso)+'분)':'')+'.');
-
-    // count distinct nights that have at least one recorded wake TIME
-    var nightsWithWakeTime=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time;});}).length;
-    if(allWakes.length>=2 && nightsWithWakeTime>=2){
-      var times=allWakes.map(function(w){
-        var m=toMin(w.time);
-        // treat evening hours (>=18:00) as "previous night" so dawn hours sort later
-        return m<12*60 ? m+24*60 : m;
-      });
-      var avgT=times.reduce(function(a,v){return a+v;},0)/times.length;
-      var hh=Math.floor((avgT%1440)/60), mm=Math.round(avgT%60);
-      var tStr=(hh===0?'12':hh>12?hh-12:hh)+(hh>=12&&hh<24?'시':'시')+(mm?' '+mm+'분':'')+'경';
-      // cluster check: are wakes consistently in a narrow window?
-      var minT=Math.min.apply(null,times),maxT=Math.max.apply(null,times);
-      var clustered=(maxT-minT)<=90;
-      if(clustered){
-        L.push('깨는 시각이 평균 '+tStr+'으로 비교적 일정합니다 — 시간대가 일관되면 원인(야간뇨·무호흡·조기각성 등) 감별에 참고할 수 있습니다.');
-      } else {
-        L.push('깨는 시각이 밤 전반에 흩어져 있습니다 — 특정 시간대 패턴은 뚜렷하지 않습니다.');
-      }
-      // early-morning awakening flag (3~5am): require it to recur across multiple nights
-      var earlyNights=entries.filter(function(e){return (e.wakes||[]).some(function(w){var m=toMin(w.time); return m!=null && m>=3*60 && m<=5*60;});}).length;
-      if(earlyNights>=2 && earlyNights>=Math.ceil(nightsWithWakeTime*0.6)) L.push('새벽 3~5시 조기 각성이 여러 날 반복됩니다.');
-    }
-
-    // recurring memo themes (simple keyword tally)
-    var notes=allWakes.map(function(w){return (w.note||'').trim();}).filter(Boolean);
-    if(notes.length>=2){
-      var kw={'소변':0,'화장실':0,'답답':0,'갈증':0,'목말':0,'통증':0,'꿈':0,'더워':0,'추워':0,'소리':0};
-      notes.forEach(function(t){ Object.keys(kw).forEach(function(k){ if(t.indexOf(k)>=0) kw[k]++; }); });
-      var top=Object.keys(kw).filter(function(k){return kw[k]>=2;});
-      if(top.length) L.push('반복되는 각성 사유: '+top.join(', ')+' — 진료 시 확인해볼 수 있습니다.');
-    }
-
-    if(spread>180) L.push('취침 시각이 약 '+(spread/60).toFixed(1)+'시간 범위로 들쭉날쭉합니다. 매일 비슷한 시간에 잠자리에 드는 것이 도움이 됩니다.');
-    else if(spread>120) L.push('취침 시각이 약 '+(spread/60).toFixed(1)+'시간 정도 차이가 있습니다. 조금 더 일정하게 맞추면 수면 리듬에 도움이 됩니다.');
-    if(sd>10) L.push('수면효율의 날짜별 변동이 큽니다 (±'+sd+'%).');
-
-    // morning condition + subjective/objective relationship
-    var aCond=entries.reduce(function(a,e){return a+(e.cond||2);},0)/n;
-    var condTxt=aCond>=2.5?'대체로 좋은 편':aCond>=1.8?'보통 수준':'좋지 않은 편';
-    L.push('아침 컨디션은 평균 '+condTxt+'입니다 (3점 만점에 '+Math.round(aCond*10)/10+'점).');
-    // correlation-lite: compare SE and condition direction
-    if(n>=4){
-      var seMean=aSe, condMean=aCond, num=0, dse=0, dco=0;
-      entries.forEach(function(e){ var x=calc(e).se-seMean, y=(e.cond||2)-condMean; num+=x*y; dse+=x*x; dco+=y*y; });
-      var r=(dse>0&&dco>0)?num/Math.sqrt(dse*dco):0;
-      if(r>=0.4) L.push('수면효율이 높은 날 아침 컨디션도 좋은 경향이 뚜렷합니다 — 객관적 수면과 주관적 만족도가 함께 움직입니다.');
-      else if(r<=-0.2) L.push('수면효율과 아침 컨디션이 반대로 움직이는 날이 있습니다 — 수치는 좋아도 개운하지 않은 경우로, 비회복성 수면이나 수면의 질 문제를 시사할 수 있습니다.');
-      else if(Math.abs(r)<0.2) L.push('수면효율과 아침 컨디션 사이에 뚜렷한 연관이 보이지 않습니다 — 주관적 만족도가 수면 수치만으로 설명되지 않을 수 있습니다.');
-    }
-
-    if(L.length===1 && aSe>=85) L.push('전반적으로 안정적인 수면 패턴을 보이고 있습니다.');
-
-    document.getElementById('t-analysis-list').innerHTML=L.map(function(x){return '<li>'+x+'</li>';}).join('');
-  }
-
-  // ---- recommendations (plain-language, action-oriented) ----
-  var LINK_CBTI='https://blog.naver.com/psychoedu/224171054991';
+  // ---- analysis: 5회기에서 배운 기법 적용 (2026-11-25, 선생님 지시) ----
+  // 원본의 해석 문장(시사·감별·비회복성 수면·수면 오지각 등)과 「이렇게 해보세요」 카드를 없애고,
+  // 최근 7일 기록(수면처방 탭과 같은 기간)을 보고 불면 CBT 5회기에서 배운 기법 중 지금 써 볼 것을 알려 준다.
+  // 기준: 입면·야간 각성 30분(선생님 결정) · 수면다원검사 권유는 원본 문구·링크 그대로(선생님 결정).
   var LINK_PSG='https://blog.naver.com/psychoedu/224242416557';
   function linkBtn(url,label){
     return '<a class="r-link" href="'+url+'" target="_blank" rel="noopener">'+label+
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a>';
   }
-  function renderRecommendations(){
-    var box=document.getElementById('t-reco');
-    if(entries.length<3){ box.style.display='none'; return; }
-    var n=entries.length;
-    var aSe=entries.reduce(function(a,e){return a+calc(e).se;},0)/n;
-    var aCond=entries.reduce(function(a,e){return a+(e.cond||2);},0)/n;
-    var aWaso=entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n;
-    var freqNights=entries.filter(isFreq).length;
-    var nightsWithWake=entries.filter(function(e){return (e.wakes||[]).some(function(w){return w.time||w.dur>0;})||isFreq(e);}).length;
+  function ymdL(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function recentEntries(){
+    var t=new Date(), today=ymdL(t); t.setDate(t.getDate()-7); var lo=ymdL(t);
+    return entries.filter(function(e){ return e.date>lo && e.date<=today; });
+  }
+  // 그 아침 기록에 걸리는 처방 (수면처방 탭 sleepDiary.rx.v1 — 처방을 정한 다음 날 아침 기록부터)
+  function rxFor(date){
+    try{ var o=JSON.parse(localStorage.getItem('sleepDiary.rx.v1')), r=null;
+      ((o&&o.list)||[]).forEach(function(x){ if(x.from<date) r=x; }); return r; }catch(err){ return null; }
+  }
+  // a가 b보다 몇 분 늦은가 (자정 넘김 고려, -720~720)
+  function diffMin(a,b){ var d=((toMin(a)-toMin(b))%1440+1440)%1440; return d>720?d-1440:d; }
+  function hasWord(notes,ws){ return notes.some(function(t){ return ws.some(function(w){ return t.indexOf(w)>=0; }); }); }
 
-    var R=[];
+  function renderAnalysis(){
+    var box=document.getElementById('t-analysis');
+    var es=recentEntries();
+    if(es.length<3){ box.style.display='none'; return; }
+    box.style.display='block';
+    var n=es.length, L=[];
+    function item(tag,what,how){ L.push('<b class="ana-tag">'+tag+'</b>'+what+(how?'<span class="ana-how">→ '+how+'</span>':'')); }
+    var notes=[];
+    es.forEach(function(e){ (e.wakes||[]).forEach(function(w){ var t=(w.note||'').trim(); if(t) notes.push(t); }); });
 
-    // Rule 1: low sleep efficiency → CBT-I
-    if(aSe<85){
-      R.push({
-        color:'var(--bad)',
-        title:'수면 습관을 점검해볼 시점이에요',
-        body:'침대에 누워 있는 시간에 비해 실제로 잠든 시간이 짧은 편입니다(평균 수면효율 '+Math.round(aSe*10)/10+'%). 이런 경우엔 약으로 잠을 재우기보다, 잠드는 습관과 잠에 대한 생각을 바로잡는 <b>불면증 인지행동치료(CBT-I)</b>가 도움이 될 수 있어요. 억지로 재우는 게 아니라, 잠이 자연스럽게 찾아오던 상태로 돌아가도록 돕는 방법입니다.',
-        link:linkBtn(LINK_CBTI,'CBT-I가 무엇인지 알아보기')
-      });
+    // 수면제한 — 계산은 「수면처방」 탭에만 둔다
+    var aSe=Math.round(es.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
+    item('수면제한','최근 7일 평균 수면효율 '+aSe+'% ('+n+'일 기록).','이번 주 눕는 시각은 <a href="#" class="ana-go" data-go="hygiene">「수면처방」 탭</a>에서 확인해요.');
+
+    // 처방 시각 지키기
+    var withRx=0, early=0, lateOut=0;
+    es.forEach(function(e){ var r=rxFor(e.date); if(!r) return; withRx++;
+      if(e.bedin && diffMin(e.bedin,r.bed)<-15) early++;
+      if(e.bedout && diffMin(e.bedout,r.wake)>15) lateOut++; });
+    if(withRx && (early||lateOut)){
+      var p=[]; if(early) p.push('15분 넘게 일찍 누운 날 '+early+'일'); if(lateOut) p.push('15분 넘게 늦게 나온 날 '+lateOut+'일');
+      item('수면제한','처방보다 '+p.join(' · ')+'이 있어요.','처방한 눕는 시각과 침대에서 나오는 시각을 지켜요. 몇 시간을 잤든 주말에도 같은 시각에 나와요.');
+    } else if(!withRx){
+      var outs=es.map(function(e){return toMin(e.bedout);}).filter(function(v){return v!=null;});
+      if(outs.length>1){
+        var base=outs[0], ds=outs.map(function(v){ var d=((v-base)%1440+1440)%1440; return d>720?d-1440:d; });
+        if(Math.max.apply(null,ds)-Math.min.apply(null,ds)>60)
+          item('자극조절','침대에서 나오는 시각이 날마다 1시간 넘게 달라요.','몇 시간을 잤든 매일 같은 시각에 일어나요 (자극조절 5번 · 수면위생 3번).');
+      }
     }
-    // Rule 2: good SE but poor morning condition → sleep misperception → CBT-I
-    else if(aSe>=85 && aCond<1.8){
-      R.push({
-        color:'var(--mid)',
-        title:'잘 잤는데도 개운하지 않다면',
-        body:'수면효율은 양호한 편인데(평균 '+Math.round(aSe*10)/10+'%) 아침 컨디션은 낮게 느껴지고 있습니다. 실제로는 충분히 잤는데도 \'못 잤다\'고 느끼는 <b>수면 오지각</b>일 가능성이 있어요. 이런 경우엔 수면에 대한 불안과 생각을 함께 다루는 <b>불면증 인지행동치료(CBT-I)</b>가 도움이 됩니다.',
-        link:linkBtn(LINK_CBTI,'CBT-I가 무엇인지 알아보기')
-      });
-    }
-    // Rule 3: recurring/frequent night awakenings → organic cause → PSG
+
+    // 자극조절 — 잠이 안 올 때
+    var solDays=es.filter(function(e){return calc(e).sol>30;}).length;
+    if(solDays) item('자극조절','잠들기까지 30분 넘게 걸린 날이 '+solDays+'일 있어요.','15분 안에 잠이 안 온다는 느낌이면 침실 밖으로 나가요. 나가서는 이완훈련(복식호흡 · 점진적 근이완 · 자율긴장이완)을 하고, 졸음이 다시 올 때만 침실로 돌아와요.');
+    var wasoDays=es.filter(function(e){return wasoTotal(e)>30;}).length;
+    if(wasoDays) item('자극조절','밤에 깨서 30분 넘게 깨어 있던 날이 '+wasoDays+'일 있어요.','깬 뒤에도 15분 안에 다시 잠이 안 온다는 느낌이면 침실 밖으로 나가요.');
+    if(hasWord(notes,['소변','화장실'])) item('자극조절','깬 이유에 소변·화장실이 적혀 있어요.','화장실에 다녀온 뒤 바로 침실로 돌아와요(집 안을 돌아다니지 않기). 그 뒤에도 계속 잠이 안 오면 자극조절을 써요.');
+
+    // 수면위생
+    var napDays=es.filter(function(e){return +e.nap>0;}).length;
+    if(napDays) item('수면위생','낮잠을 잔 날이 '+napDays+'일 있어요.','낮잠은 피하고, 꼭 자야 한다면 오후 3시 전, 30분 이내로 해요 (수면위생 13번).');
+
+    // 생각 바꾸기 (3·4회기)
+    var badDays=es.filter(function(e){return e.cond===1;}).length;
+    if(badDays) item('생각 바꾸기','아침 컨디션이 「나쁘다」인 날이 '+badDays+'일 있어요.','"오늘 하루를 망칠 거야" 같은 생각이 떠오르면, <a href="#" class="ana-go" data-go="think">「생각바꾸기」 탭</a>에 적어 보며 다른 생각을 찾아봐요. 수면 처방 카드에 적은 바뀐 생각도 떠올려요.');
+
+    // 마음챙김 (5회기)
+    if(hasWord(notes,['걱정','생각','고민','불안','잡념']))
+      item('마음챙김','깬 이유에 걱정·생각이 적혀 있어요.','2분 넘게 생각이 이어지면 2분 규칙으로 확인하고, 되새김이면 마음챙김 호흡이나 감각 알아차리기를 해요. 밤에 침실 밖에서는 휴대폰 없이, 낮에는 「마음챙김」 탭으로 연습해요.');
+
+    // 수면다원검사 권유 — 원본 「이렇게 해보세요」 문구·링크 그대로 (선생님 결정)
+    var aWaso=es.reduce(function(a,e){return a+wasoTotal(e);},0)/n;
+    var freqNights=es.filter(isFreq).length;
+    var nightsWithWake=es.filter(function(e){return (e.wakes||[]).some(function(w){return w.time||w.dur>0;})||isFreq(e);}).length;
     if(nightsWithWake>=Math.ceil(n*0.5) || aWaso>30 || freqNights>=Math.ceil(n*0.3)){
       var freqPhrase = freqNights>0
         ? '하룻밤에 4회 이상 자주 깬 날이 '+freqNights+'/'+n+'일 있을 만큼 수면이 자주 끊기고 있습니다.'
         : '새벽 각성이 반복되고 있습니다('+nightsWithWake+'/'+n+'일'+(aWaso>0?', 평균 '+Math.round(aWaso)+'분':'')+').';
-      R.push({
-        color:'var(--night-2)',
-        title:'새벽에 자주 깬다면 원인을 확인해보세요',
-        body:freqPhrase+' 잠드는 습관 외에 코골이·수면무호흡 같은 <b>몸의 원인</b>이 숨어 있을 수 있어요. 특히 약을 먹어도 개운하지 않거나 낮에 많이 졸리다면, 전문가와 함께 <b>수면다원검사</b>로 원인을 확인해보시길 권합니다.',
-        link:linkBtn(LINK_PSG,'수면다원검사 알아보기')
-      });
+      L.push('<b class="ana-tag">진료</b>새벽에 자주 깬다면 원인을 확인해보세요<span class="ana-how">'+freqPhrase+' 잠드는 습관 외에 코골이·수면무호흡 같은 <b>몸의 원인</b>이 숨어 있을 수 있어요. 특히 약을 먹어도 개운하지 않거나 낮에 많이 졸리다면, 전문가와 함께 <b>수면다원검사</b>로 원인을 확인해보시길 권합니다.</span>'+linkBtn(LINK_PSG,'수면다원검사 알아보기'));
     }
 
-    if(!R.length){
-      R.push({
-        color:'var(--good)',
-        title:'좋은 흐름을 보이고 있어요',
-        body:'기록상 수면효율과 아침 컨디션이 모두 안정적입니다. 지금의 규칙적인 수면 리듬을 유지해보세요. 혹시 패턴이 달라지면 이 화면에서 다시 안내해 드릴게요.',
-        link:''
-      });
-    }
-    box.style.display='block';
-    document.getElementById('t-reco-list').innerHTML=R.map(function(r){
-      return '<div class="reco-item">'+
-        '<div class="r-title"><span class="dot" style="background:'+r.color+'"></span>'+r.title+'</div>'+
-        '<div class="r-body">'+r.body+'</div>'+
-        r.link+
-        '</div>';
-    }).join('');
+    if(L.length===1) item('잘하고 있어요','최근 7일 기록에서 눈에 띄는 것이 없어요.','지금처럼 처방 시각을 지키고 수면일기를 이어 가요.');
+
+    var ul=document.getElementById('t-analysis-list');
+    ul.innerHTML=L.map(function(x){return '<li>'+x+'</li>';}).join('');
+    ul.querySelectorAll('.ana-go').forEach(function(go){ go.addEventListener('click',function(ev){ ev.preventDefault();
+      var b=document.querySelector('.modes button[data-view="'+go.dataset.go+'"]'); if(b){ b.click(); window.scrollTo(0,0); } }); });
   }
 
   // ---- review log ----
@@ -1121,21 +1167,21 @@
   function buildPrintHTML(){
     var today=new Date().toISOString().slice(0,10);
     var n=entries.length;
-    // summary stats
-    var statsHTML='';
-    if(n){
-      var aSe=Math.round(entries.reduce(function(a,e){return a+calc(e).se;},0)/n*10)/10;
-      var aTst=entries.reduce(function(a,e){return a+calc(e).tst;},0)/n;
-      var aSol=Math.round(entries.reduce(function(a,e){return a+calc(e).sol;},0)/n);
-      var aWaso=Math.round(entries.reduce(function(a,e){return a+wasoTotal(e);},0)/n);
-      var aCond=Math.round(entries.reduce(function(a,e){return a+(e.cond||2);},0)/n*10)/10;
-      statsHTML='<div class="psum">'+
+    // summary stats — 화면과 같이 최근 7일 평균 (아래 표는 전체 기록)
+    var statsHTML='', es=recentEntries(), m=es.length;
+    if(m){
+      var aSe=Math.round(es.reduce(function(a,e){return a+calc(e).se;},0)/m*10)/10;
+      var aTst=es.reduce(function(a,e){return a+calc(e).tst;},0)/m;
+      var aSol=Math.round(es.reduce(function(a,e){return a+calc(e).sol;},0)/m);
+      var aWaso=Math.round(es.reduce(function(a,e){return a+wasoTotal(e);},0)/m);
+      var aCond=Math.round(es.reduce(function(a,e){return a+(e.cond||2);},0)/m*10)/10;
+      statsHTML='<div style="font-size:12px;color:#555;margin:0 0 4px">최근 7일 평균</div><div class="psum">'+
         '<div><span>'+aSe+'%</span>평균 수면효율</div>'+
         '<div><span>'+fmtDur(aTst)+'</span>평균 총수면</div>'+
         '<div><span>'+aSol+'분</span>평균 입면시간</div>'+
         '<div><span>'+aWaso+'분</span>평균 야간각성</div>'+
         '<div><span>'+aCond+' / 3</span>평균 컨디션</div>'+
-        '<div><span>'+n+'일</span>기록 일수</div>'+
+        '<div><span>'+m+' / 7일</span>기록 일수</div>'+
         '</div>';
     }
     // data table
@@ -1168,24 +1214,14 @@
     var anaHTML='';
     var anaBox=document.getElementById('t-analysis');
     if(anaBox && anaBox.style.display!=='none'){
-      var items=Array.prototype.slice.call(document.querySelectorAll('#t-analysis-list li')).map(function(li){return '<li>'+li.textContent+'</li>';}).join('');
+      var items=Array.prototype.slice.call(document.querySelectorAll('#t-analysis-list li')).map(function(li){
+        var c=li.cloneNode(true), a=c.querySelector('.r-link'), url=a?a.getAttribute('href'):'', lbl=a?a.textContent.trim():'';
+        if(a) a.remove(); c.querySelectorAll('.ana-tag').forEach(function(t){ t.textContent='['+t.textContent+'] '; });
+        c.querySelectorAll('.ana-how').forEach(function(h){ h.textContent=' '+h.textContent; });
+        return '<li>'+c.textContent+(url?' ('+lbl+': '+url+')':'')+'</li>'; }).join('');
       if(items) anaHTML='<h2>패턴 분석</h2><ul class="pana">'+items+'</ul>';
     }
-    // recommendations (read currently-rendered cards, including link URLs)
-    var recoHTML='';
-    var recoBox=document.getElementById('t-reco');
-    if(recoBox && recoBox.style.display!=='none'){
-      var cards=Array.prototype.slice.call(document.querySelectorAll('#t-reco-list .reco-item')).map(function(it){
-        var t=it.querySelector('.r-title')?it.querySelector('.r-title').textContent.trim():'';
-        var b=it.querySelector('.r-body')?it.querySelector('.r-body').textContent.trim():'';
-        var a=it.querySelector('.r-link');
-        var url=a?a.getAttribute('href'):'';
-        var lbl=a?a.textContent.trim():'';
-        return '<div class="prec"><div class="prec-t">'+t+'</div><div class="prec-b">'+b+'</div>'+
-          (url?'<div class="prec-l">'+lbl+': '+url+'</div>':'')+'</div>';
-      }).join('');
-      if(cards) recoHTML='<h2>이렇게 해보세요</h2>'+cards;
-    }
+    var recoHTML='';   // 「이렇게 해보세요」 카드는 패턴 분석에 합쳐 없앰 (2026-11-25)
     return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>수면일기 요약</title>'+
       '<style>'+
       '*{margin:0;padding:0;box-sizing:border-box;}'+
@@ -1264,13 +1300,14 @@
 
   // ---- toast ----
   var tTimer;
+  window.sdToast=function(m){ toast(m); };
   function toast(msg){
     var t=document.getElementById('toast');
     t.textContent=msg; t.classList.add('show');
     clearTimeout(tTimer); tTimer=setTimeout(function(){t.classList.remove('show');},2200);
   }
 
-  function renderAll(){ renderStats(); renderTimeline(); renderAnalysis(); renderRecommendations(); renderLog(); if(document.getElementById('view-trends').classList.contains('active')) renderChart(); }
+  function renderAll(){ renderStats(); renderTimeline(); renderAnalysis(); renderLog(); if(document.getElementById('view-trends').classList.contains('active')) renderChart(); }
   renderAll();
 })();
 
@@ -1508,6 +1545,201 @@ document.querySelectorAll('[data-slot]').forEach(el=>{ el.innerHTML=mpHTML(el.da
 document.querySelectorAll('[data-min]').forEach(el=>{ el.textContent=mpMin(el.dataset.min); });
 // 앱을 내려 두면 멈춘다 (돌아왔을 때 안내가 건너뛰어 있지 않게)
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) mpHoldAll(); });
+</script>
+<script>
+/* =========================================================
+   수면처방 탭 — 수면제한 주간 조정
+   규칙(불면 CBT 5회기 도구 adjust()와 같음) [내 자료, 불면증 인지행동치료2회기, 슬라이드 21·23]:
+     지난 7일 평균 수면효율 85% 이상 → 15분 일찍 눕기 · 80~85% → 그대로 · 80% 미만 → 15분 늦게 눕기
+     침대에서 나오는 시각은 그대로, 침대에 있는 시간은 5시간보다 줄이지 않음 (선생님 확인 2026-11-24 — 수면제한요법.docx의 4.5시간이 아니라 슬라이드 23의 5시간)
+   7일 중 5일 이상 기록이 있어야 계산 (선생님 결정 2026-11-24)
+   늦게 눕기가 나오면 "무리라고 생각되면 그대로 둬도 돼요" (선생님 지시 2026-11-24)
+   저장: localStorage 'sleepDiary.rx.v1' = {list:[{from,bed,wake,how,se,n}]} — 수면일기 기록(sleepDiary.v1)과 따로
+   ========================================================= */
+(function(){
+  var RXKEY='sleepDiary.rx.v1', HI=85, LO=80, MINTIB=300, NEED=5, editing=false;
+  function pad(n){ return (n<10?'0':'')+n; }
+  function ymd(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function addDays(str,n){ var d=new Date(str+'T00:00:00'); d.setDate(d.getDate()+n); return ymd(d); }
+  function md(str){ return (+str.slice(5,7))+'월 '+(+str.slice(8,10))+'일'; }
+  function toMin(t){ if(!t) return null; var p=t.split(':'); return (+p[0])*60+(+p[1]); }
+  function hm(m){ m=((m%1440)+1440)%1440; return pad(Math.floor(m/60))+':'+pad(m%60); }
+  function tibOf(bed,wake){ return ((toMin(wake)-toMin(bed))%1440+1440)%1440; }
+  function dur(m){ m=Math.round(m); return Math.floor(m/60)+'시간'+(m%60?' '+(m%60)+'분':''); }
+  function load(){ try{ var o=JSON.parse(localStorage.getItem(RXKEY)); return (o&&o.list)||[]; }catch(e){ return []; } }
+  function store(l){ try{ localStorage.setItem(RXKEY,JSON.stringify({list:l})); return true; }catch(e){ if(window.sdToast) sdToast('저장 공간이 부족합니다'); return false; } }
+  var HOW={start:'시작',clinic:'진료에서 바꿈',up:'15분 일찍 눕기',same:'그대로',down:'15분 늦게 눕기',keep:'그대로 둠'};
+
+  function adjust(cur,se){
+    var tib=tibOf(cur.bed,cur.wake), dir;
+    if(se>=HI){ tib+=15; dir='up'; } else if(se>=LO){ dir='same'; } else { tib-=15; dir='down'; }
+    var floored=false; if(tib<MINTIB){ tib=MINTIB; floored=true; }
+    if(floored && tib===tibOf(cur.bed,cur.wake)) dir='same';   // 이미 5시간이면 더 줄일 것이 없다
+    return {bed:hm(toMin(cur.wake)-tib),wake:cur.wake,tib:tib,dir:dir,floored:floored};
+  }
+  // 처방을 시작한 다음 날 아침 기록부터, 오늘까지의 최근 7일
+  function windowStats(cur,today){
+    var lo=cur.from>addDays(today,-7)?cur.from:addDays(today,-7);
+    var es=(window.sdEntries?sdEntries():[]).filter(function(e){ return e.date>lo && e.date<=today; });
+    var n=es.length, se=n?Math.round(es.reduce(function(a,e){return a+sdCalc(e).se;},0)/n*10)/10:null;
+    return {n:n,se:se};
+  }
+
+  function formHTML(cur){
+    return '<div class="rx-form">'+
+      '<div class="card-sub" style="margin-bottom:12px">'+(cur?'진료에서 새로 정한 처방을 적어 주세요.':'진료 때 선생님과 정한 수면 처방(눕는 시각 · 침대에서 나오는 시각)을 적으면, 그다음부터는 수면일기로 1주일마다 눕는 시각을 계산해 드려요.')+'</div>'+
+      '<div class="grid2"><div class="field"><label>눕는 시각</label><input type="time" id="rx-bed" value="'+(cur?cur.bed:'')+'"></div>'+
+      '<div class="field"><label>침대에서 나오는 시각</label><input type="time" id="rx-wake" value="'+(cur?cur.wake:'')+'"></div></div>'+
+      '<div class="btn-row"><button class="btn btn-primary btn-sm" id="rx-save">'+(cur?'이 처방으로 바꾸기':'처방 시작하기')+'</button>'+
+      (cur?'<button class="btn btn-ghost btn-sm" id="rx-cancel">취소</button>':'')+'</div></div>';
+  }
+
+  window.rxRender=function(){
+    var box=document.getElementById('rx-box'); if(!box) return;
+    var list=load(), cur=list[list.length-1], today=ymd(new Date());
+    if(!cur||editing){ box.innerHTML=formHTML(cur); bindForm(cur); return; }
+
+    var tib=tibOf(cur.bed,cur.wake), due=addDays(cur.from,7), h='';
+    h+='<div class="rx-big"><div><b>'+cur.bed+'</b><span>눕는 시각</span></div><div><b>'+cur.wake+'</b><span>침대에서 나오는 시각</span></div><div><b class="s">'+dur(tib)+'</b><span>침대에 있는 시간</span></div></div>';
+    h+='<div class="rx-meta">'+md(cur.from)+'부터 · 졸릴 때만 눕고, 나오는 시각은 주말에도 같게</div>';
+
+    var w=windowStats(cur,today);
+    if(today<due){
+      h+='<div class="rx-check"><div class="h">다음 점검: '+md(due)+' 아침</div><div style="font-size:13px;color:var(--ink-soft)">이 처방으로 7일을 지낸 뒤, 그동안의 수면일기로 눕는 시각을 다시 계산해요. 지금까지 기록 '+w.n+'일.</div></div>';
+    } else if(w.n<NEED){
+      h+='<div class="rx-check"><div class="h">이번 주 점검</div><div style="font-size:13px;line-height:1.6">지난 7일 기록이 <b>'+w.n+'일</b>이에요. '+NEED+'일 이상 있어야 계산할 수 있어요. 이번 주는 지금 처방 그대로 지내고, 7일 뒤 다시 확인해요.</div>'+
+        '<button class="btn btn-primary btn-sm" style="margin-top:12px" data-apply="same">그대로 1주 더</button></div>';
+    } else {
+      var a=adjust(cur,w.se), lab={up:'15분 일찍 눕기',same:'그대로',down:'15분 늦게 눕기'}[a.dir];
+      h+='<div class="rx-check"><div class="h">지난 7일 평균 수면효율 '+w.se+'% <span class="rx-badge '+a.dir+'">'+lab+'</span></div>'+
+        '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px">기록 '+w.n+'일 · 다음 7일 처방</div>'+
+        '<div class="rx-big" style="margin-bottom:0"><div><b>'+a.bed+'</b><span>눕는 시각</span></div><div><b>'+a.wake+'</b><span>침대에서 나오는 시각</span></div><div><b class="s">'+dur(a.tib)+'</b><span>침대에 있는 시간</span></div></div>'+
+        (a.floored?'<div class="rx-note">침대에 있는 시간은 5시간보다 줄이지 않아요.</div>':'')+
+        (a.dir==='down'?'<div class="rx-note">수면시간이 너무 적어 무리라고 생각되면 그대로 둬도 돼요.</div>'+
+          '<div class="btn-row"><button class="btn btn-primary btn-sm" data-apply="down">15분 늦게 눕기</button><button class="btn btn-ghost btn-sm" data-apply="keep">그대로 두기</button></div>'
+          :'<button class="btn btn-primary btn-sm" style="margin-top:12px" data-apply="'+a.dir+'">이 처방으로 정하기</button>')+
+        '</div>';
+    }
+    h+='<div class="rx-info">기준: 지난 7일 평균 수면효율 '+HI+'% 이상 → 15분 일찍 눕기 · '+LO+'~'+HI+'% → 그대로 · '+LO+'% 미만 → 15분 늦게 눕기 · 침대에서 나오는 시각은 그대로 · 침대에 있는 시간은 5시간 이상<br>처음 1~2주는 낮에 더 졸리고 피곤할 수 있어요. 졸릴 때 운전이나 위험한 작업은 피해요.</div>';
+    h+='<ul class="rx-hist">'+list.slice(-6).reverse().map(function(r){
+      return '<li><span>'+md(r.from)+' · <b>'+r.bed+' – '+r.wake+'</b> ('+dur(tibOf(r.bed,r.wake))+')</span><span>'+HOW[r.how]+(r.se!=null?' · '+r.se+'%':'')+'</span></li>';
+    }).join('')+'</ul>';
+    h+='<button class="rx-link" id="rx-edit">진료에서 처방이 바뀌었어요</button>';
+    box.innerHTML=h;
+
+    box.querySelectorAll('[data-apply]').forEach(function(b){ b.addEventListener('click',function(){
+      var how=b.dataset.apply, l=load(), c=l[l.length-1], st=windowStats(c,today), next={from:today,bed:c.bed,wake:c.wake,how:how,se:st.n>=NEED?st.se:null,n:st.n};
+      if(how==='up'||how==='down'||how==='same'){ if(st.n>=NEED){ var ad=adjust(c,st.se); next.bed=ad.bed; } }
+      l.push(next); if(store(l)){ if(window.sdToast) sdToast('처방을 정했어요'); rxRender(); }
+    }); });
+    document.getElementById('rx-edit').addEventListener('click',function(){ editing=true; rxRender(); });
+  };
+
+  function bindForm(cur){
+    document.getElementById('rx-save').addEventListener('click',function(){
+      var bed=document.getElementById('rx-bed').value, wake=document.getElementById('rx-wake').value;
+      if(!bed||!wake){ if(window.sdToast) sdToast('두 시각을 모두 적어 주세요'); return; }
+      if(bed===wake){ if(window.sdToast) sdToast('눕는 시각과 나오는 시각이 같아요'); return; }
+      if(tibOf(bed,wake)<MINTIB){ if(window.sdToast) sdToast('침대에 있는 시간은 5시간 이상이어야 해요'); return; }
+      var l=load(); l.push({from:ymd(new Date()),bed:bed,wake:wake,how:cur?'clinic':'start',se:null,n:0});
+      if(store(l)){ editing=false; rxRender(); }
+    });
+    var c=document.getElementById('rx-cancel'); if(c) c.addEventListener('click',function(){ editing=false; rxRender(); });
+  }
+  rxRender();
+})();
+</script>
+<script>
+/* =========================================================
+   생각바꾸기 탭 (2026-11-25, 선생님 지시)
+   두뇌 CBT도구\불면_CBT_5회기.html 3회기 ④·4회기에서 줄여 옮김.
+   감정 8가지 · 인지오류 11가지(★ = 불면 슬라이드의 다섯 가지)는 센터 Face 양식 그대로.
+   ========================================================= */
+(function(){
+  var KEY='sleepDiary.thought.v1', DKEY='sleepDiary.thought.draft';
+  var EMO=['공포','분노','불안','실망','좌절','우울','짜증','기타'];
+  var ERR=['흑백논리의 오류','재앙화','명명하기','과대평가/과소평가','감정적 추론','정신적 여과','독심술의 오류','지나친 일반화','자기 탓','당위진술','터널시야'];
+  var STAR=['재앙화','당위진술','흑백논리의 오류','지나친 일반화','정신적 여과'];
+  function load(k,d){ try{ var o=JSON.parse(localStorage.getItem(k)); return o||d; }catch(e){ return d; } }
+  function put(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ if(window.sdToast) sdToast('저장 공간이 부족합니다'); return false; } }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function today(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  var D=load(DKEY,{});
+  function saveDraft(){ put(DKEY,D); }
+  function opt(vals,cur,first,suf){ return '<option value="">'+first+'</option>'+vals.map(function(v){ return '<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+v+(suf||'')+'</option>'; }).join(''); }
+  var N10=[1,2,3,4,5,6,7,8,9,10], P10=[0,10,20,30,40,50,60,70,80,90,100];
+  function inp(k,ph){ return '<input type="text" data-k="'+k+'" value="'+esc(D[k]||'')+'" placeholder="'+esc(ph||'')+'">'; }
+  function ta(k,ph){ return '<textarea data-k="'+k+'" placeholder="'+esc(ph||'')+'">'+esc(D[k]||'')+'</textarea>'; }
+
+  function formHTML(){
+    var err=D.err||[];
+    return ''+
+    '<div class="th-step">① 생각 찾기</div>'+
+    '<div class="field"><label>상황 — 언제 · 어디서 · 무엇을</label>'+inp('sit','예: 어제 밤 10시, 침실, 누웠는데 30분 넘게 잠이 안 옴')+'</div>'+
+    '<div class="field"><label>감정 — 가장 강했던 것 하나와 정도 (1~10)</label>'+
+      '<div class="th-chips" data-pick="emo">'+EMO.map(function(x){return '<span class="'+(D.emo===x?'on':'')+'" data-v="'+x+'">'+x+'</span>';}).join('')+'</div>'+
+      '<select data-k="emoS">'+opt(N10,D.emoS,'정도')+'</select></div>'+
+    '<div class="field"><label>자동사고 — 그때 저절로 떠오른 생각</label>'+inp('auto','예: 오늘 못 자면 내일 회의를 망칠 거야')+'</div>'+
+    '<div class="field"><label>이 생각을 믿는 정도 (%)</label><select data-k="bel">'+opt(P10.slice(1),D.bel,'-','%')+'</select></div>'+
+    '<details class="th-opt"'+(err.length?' open':'')+'><summary>인지오류 고르기 (선택 · ★ 는 불면에서 흔한 것)</summary>'+
+      '<div class="th-chips" data-pick="err">'+ERR.map(function(x){return '<span class="'+(STAR.indexOf(x)>=0?'star ':'')+(err.indexOf(x)>=0?'on':'')+'" data-v="'+x+'">'+x+'</span>';}).join('')+'</div></details>'+
+    '<div class="th-step">② 생각 바꾸기</div>'+
+    '<div class="field"><label>증거 찾기</label><div class="th-hint">이전 경험, 이미 확인된 사실, 내가 놓치고 있는 긍정적·중립적 사실을 찾아요. 사소한 증거라도 무시하지 않아요.</div>'+
+      ta('for','맞다는 증거')+'<div style="height:8px"></div>'+ta('against','틀리다는 증거')+'</div>'+
+    '<div class="field"><label>다르게 생각해 보기</label><div class="th-hint">자동사고와 다른 생각을 최대한 많이 떠올려요. 중립적이거나 긍정적인 것으로요.</div>'+
+      ta('alt','예: 조금 멍해도 쉬엄쉬엄하면 할 일은 할 수 있을 듯')+'</div>'+
+    '<div class="field"><label>최악 vs 현실 — 실제로 일어날 일은?</label><div class="th-hint">내가 걱정하는 최악의 상황이 정말 견디기 불가능한지, 정말 그렇게 될 확률은 얼마인지 생각해 봐요.</div>'+
+      ta('real','실제로 일어날 일 (현실적인 상황)')+'</div>'+
+    '<div class="th-step">③ 내 생각이 이렇게 바뀌었어요</div>'+
+    '<div class="field"><label>합리적인 생각</label>'+ta('rational','예: 못 자도 내일 피곤할 뿐 할 일은 할 수 있다. 회의 전에 커피 한 잔 하자.')+'</div>'+
+    '<div class="th-row field"><div><label>감정 다시 매기기'+(D.emoS?' (처음 '+esc(D.emoS)+'점)':'')+'</label><select data-k="emoAfter">'+opt(N10,D.emoAfter,'지금')+'</select></div>'+
+      '<div><label>믿는 정도'+(D.bel?' (처음 '+esc(D.bel)+'%)':'')+'</label><select data-k="belAfter">'+opt(P10,D.belAfter,'지금','%')+'</select></div></div>'+
+    '<button type="button" class="btn btn-primary" id="th-save">저장하기</button>'+
+    '<div style="height:8px"></div><button type="button" class="btn btn-ghost btn-sm" id="th-reset">지우고 새로 쓰기</button>';
+  }
+  function listHTML(){
+    var L=load(KEY,{list:[]}).list||[];
+    if(!L.length) return '<div class="card-sub" style="margin:0">아직 적은 것이 없어요.</div>';
+    return L.slice().reverse().map(function(r){
+      var meta=[]; if(r.emo) meta.push(esc(r.emo)+' '+(r.emoS||'-')+(r.emoAfter?' → '+r.emoAfter:'')+'점');
+      if(r.bel) meta.push('믿는 정도 '+r.bel+'%'+(r.belAfter!==''&&r.belAfter!=null?' → '+r.belAfter+'%':''));
+      var more=[['상황',r.sit],['인지오류',(r.err||[]).join(', ')],['맞다는 증거',r['for']],['틀리다는 증거',r.against],['다른 생각',r.alt],['실제로 일어날 일',r.real]]
+        .filter(function(x){return x[1];}).map(function(x){return '<div><b>'+x[0]+'</b> '+esc(x[1]).replace(/\n/g,'<br>')+'</div>';}).join('');
+      return '<div class="th-rec"><div class="top"><span>'+(+r.date.slice(5,7))+'월 '+(+r.date.slice(8,10))+'일'+(r.sit?' · '+esc(r.sit.length>24?r.sit.slice(0,24)+'…':r.sit):'')+'</span><span class="x" data-del="'+r.id+'" aria-label="지우기">×</span></div>'+
+        (r.auto?'<div class="a">"'+esc(r.auto)+'"</div>':'')+(r.rational?'<div class="r">→ '+esc(r.rational)+'</div>':'')+
+        (meta.length?'<div class="m">'+meta.join(' · ')+'</div>':'')+(more?'<details><summary>자세히</summary>'+more+'</details>':'')+'</div>';
+    }).join('');
+  }
+  function render(){
+    var f=document.getElementById('th-form'), l=document.getElementById('th-list'); if(!f) return;
+    f.innerHTML=formHTML(); l.innerHTML=listHTML();
+    f.querySelectorAll('[data-k]').forEach(function(el){
+      el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){ D[el.dataset.k]=el.value; saveDraft();
+        if(el.tagName==='SELECT' && (el.dataset.k==='emoS'||el.dataset.k==='bel')) render(); });
+    });
+    f.querySelectorAll('[data-pick] span').forEach(function(sp){
+      sp.addEventListener('click',function(){ var k=sp.parentNode.dataset.pick, v=sp.dataset.v;
+        if(k==='emo') D.emo=(D.emo===v?'':v);
+        else { var a=D.err||[], j=a.indexOf(v); if(j>=0) a.splice(j,1); else a.push(v); D.err=a; }
+        saveDraft(); render(); });
+    });
+    document.getElementById('th-save').addEventListener('click',function(){
+      if(!(D.sit||'').trim() && !(D.auto||'').trim()){ if(window.sdToast) sdToast('상황이나 자동사고를 먼저 적어 주세요'); return; }
+      var o=load(KEY,{list:[]}); o.list=o.list||[];
+      o.list.push({id:Date.now(),date:today(),sit:D.sit||'',emo:D.emo||'',emoS:D.emoS||'',auto:D.auto||'',bel:D.bel||'',err:D.err||[],
+        'for':D['for']||'',against:D.against||'',alt:D.alt||'',real:D.real||'',rational:D.rational||'',emoAfter:D.emoAfter||'',belAfter:D.belAfter==null?'':D.belAfter});
+      if(put(KEY,o)){ D={}; saveDraft(); render(); if(window.sdToast) sdToast('저장했어요'); }
+    });
+    document.getElementById('th-reset').addEventListener('click',function(){
+      if(!Object.keys(D).some(function(k){ var v=D[k]; return Array.isArray(v)?v.length:v; })) return;
+      if(!confirm('지금 적고 있는 내용을 지울까요?')) return; D={}; saveDraft(); render(); });
+    l.querySelectorAll('[data-del]').forEach(function(x){ x.addEventListener('click',function(){
+      if(!confirm('이 기록을 지울까요?')) return;
+      var o=load(KEY,{list:[]}); o.list=(o.list||[]).filter(function(r){ return String(r.id)!==x.dataset.del; }); put(KEY,o); render(); }); });
+  }
+  window.thRender=render;
+  render();
+})();
 </script>
 </body>
 </html>
