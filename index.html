@@ -270,9 +270,11 @@
   @keyframes spl{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
   @media (max-width:480px){
     .modes{gap:4px;}
-    .modes button{flex-direction:column;gap:3px;padding:8px 1px;font-size:12px;letter-spacing:-0.4px;}
+    .modes{gap:3px;padding:4px;}
+    .modes button{flex-direction:column;gap:3px;padding:8px 0;font-size:12px;letter-spacing:-0.5px;white-space:nowrap;min-width:0;}
   }
 
+  @media (max-width:360px){ .modes button{font-size:11px;letter-spacing:-0.6px;} }
   /* 생각바꾸기 탭 */
   #view-think input[type=text],#view-think textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-size:14.5px;font-family:inherit;color:var(--ink);background:var(--paper);-webkit-appearance:none;}
   #view-think textarea{min-height:64px;resize:vertical;line-height:1.55;}
@@ -414,6 +416,34 @@
     -webkit-tap-highlight-color:transparent;}
   .install-bar button.ghost{background:var(--paper);color:var(--ink-soft);border:1.5px solid var(--line);}
   .install-bar button:active{transform:scale(.97);}
+  /* 활성화(사용 기간) — 잠기면 기록·수면처방·생각바꾸기·마음챙김을 가리고, 추이(지난 기록·인쇄)만 연다 */
+  #installCode{display:none;width:100%;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:11px;font-family:inherit;font-size:11px;line-height:1.5;color:var(--ink-soft);background:var(--canvas);resize:none;height:66px;word-break:break-all;-webkit-user-select:all;user-select:all;}
+  #installCode.show{display:block;}
+  .lock-view{display:none;background:var(--bad-bg);border:1px solid #f0d0c5;border-radius:var(--radius);padding:20px 18px;margin-bottom:16px;text-align:center;}
+  body.locked .lock-view{display:block;}
+  body.locked #view-input > :not(.lock-view),body.locked #view-hygiene > :not(.lock-view),
+  body.locked #view-think > :not(.lock-view),body.locked #view-mind > :not(.lock-view){display:none!important;}
+  .lock-view p{font-size:13.5px;line-height:1.7;color:var(--bad);margin-bottom:12px;white-space:pre-line;}
+  .lock-view button{padding:11px 20px;border:none;border-radius:10px;background:var(--bad);color:#fff;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;}
+  .lock-view.ok{background:var(--good-bg);border-color:#b8dcc4;}
+  .lock-view.ok p{color:var(--good);margin-bottom:0;}
+  .lock-view.ok button{display:none;}
+  .lic-row{text-align:center;margin:4px 0 16px;font-size:12px;color:var(--ink-faint);line-height:1.7;}
+  .lic-row b{color:var(--ink-soft);}
+  .lic-row button{border:none;background:none;font-family:inherit;font-size:12px;color:var(--night-2);font-weight:600;text-decoration:underline;cursor:pointer;}
+  .act-sheet{display:none;position:fixed;inset:0;background:rgba(20,30,50,.45);z-index:50;align-items:flex-end;justify-content:center;}
+  .act-sheet.open{display:flex;}
+  .act-card{background:var(--paper);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:22px 20px 26px;}
+  .act-card h2{font-size:16px;margin-bottom:4px;}
+  .act-card .note{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+  #actInput{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:13px;color:var(--ink);min-height:84px;resize:vertical;line-height:1.5;word-break:break-all;margin-bottom:8px;}
+  #actInput:focus{outline:none;border-color:var(--night-2);}
+  .act-msg{font-size:12.5px;text-align:center;min-height:17px;margin-bottom:12px;color:var(--good);}
+  .act-msg.err{color:var(--bad);}
+  .act-btns{display:flex;gap:8px;}
+  .act-btns button{flex:1;padding:13px;border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+  .act-btns .cancel{background:var(--line-soft);color:var(--ink-soft);}
+  .act-btns .go{background:var(--night);color:#fff;}
 </style>
 </head>
 <body>
@@ -445,8 +475,10 @@
   <!-- 설치 안내. 기록/추이 어느 탭에서도 보이도록 탭 바로 아래에 둔다 -->
   <div class="install-bar" id="installBar">
     <p id="installText"></p>
+    <textarea id="installCode" readonly></textarea>
     <div class="row">
       <button id="installAction">홈 화면에 설치</button>
+      <button id="installCopy" style="display:none">코드 복사</button>
       <button class="ghost" id="installClose">나중에</button>
     </div>
   </div>
@@ -697,6 +729,16 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="act-sheet" id="actSheet">
+  <div class="act-card">
+    <h2>활성화 코드 입력</h2>
+    <p class="note">센터에서 받은 코드를 그대로 붙여넣으세요.</p>
+    <textarea id="actInput" placeholder="받은 코드를 붙여넣기"></textarea>
+    <p class="act-msg" id="actMsg"></p>
+    <div class="act-btns"><button class="cancel" id="actCancel">취소</button><button class="go" id="actConfirm">확인</button></div>
+  </div>
+</div>
+
 <!-- Chart.js를 저장소 안에 두고 쓴다. cdnjs에서 받아오면 인터넷이 없을 때
      「추이」 탭이 Chart is not defined 로 멈춘다. 설치해서 쓰는 앱이라
      밖에서 받아오는 것이 하나도 없어야 한다. (Chart.js v4.4.1, MIT) -->
@@ -852,6 +894,7 @@
 
   // ---- save ----
   document.getElementById('f-save').addEventListener('click',function(){
+    if(document.body.classList.contains('locked')) return;
     var e=readForm();
     if(!e.date){ toast('날짜를 선택하세요'); return; }
     var i=entries.findIndex(function(x){return x.date===e.date;});
@@ -1343,9 +1386,24 @@
     var isAndroid = /Android/i.test(ua);
     var isIOS = /iPad|iPhone|iPod/i.test(ua);
 
+    var pend = window.sdPendingCode || '';
+    var copy = document.getElementById('installCopy'), codeBox = document.getElementById('installCode');
     bar.classList.remove('show');
+    copy.style.display = pend ? '' : 'none';
+    codeBox.classList.toggle('show', !!pend);
+    if(pend) codeBox.value = pend;
     if(isStandalone()) return;
 
+    if(inAppBrowser() && pend){
+      // 카톡 안의 브라우저는 홈 화면 앱과 저장 공간이 다르다. 여기서 활성화해도 앱에 전해지지 않는다
+      text.textContent = isAndroid
+        ? '카톡 안에서는 활성화해도 홈 화면 앱에 전해지지 않아요.\n크롬으로 열거나, 코드를 복사해 앱에 붙여넣어 주세요.'
+        : '카톡 안에서는 활성화해도 홈 화면 앱에 전해지지 않아요.\n코드를 복사해 앱에 붙여넣어 주세요.';
+      action.textContent = '크롬으로 열기';
+      action.style.display = isAndroid ? '' : 'none';
+      bar.classList.add('show');
+      return;
+    }
     if(inAppBrowser()){
       var where = isKakao() ? '카톡' : '앱';
       text.textContent = isAndroid
@@ -1353,6 +1411,14 @@
         : '지금은 ' + where + ' 안의 브라우저로 열려 있어요.\n오른쪽 아래 버튼을 눌러 사파리로 열어주세요.';
       action.textContent = '크롬으로 열기';
       action.style.display = isAndroid ? '' : 'none';
+      bar.classList.add('show');
+      return;
+    }
+
+    // 사파리에서 활성화는 됐지만 홈 화면 앱은 저장 공간이 따로인 경우
+    if(pend){
+      text.textContent = '홈 화면 앱에서도 쓰시려면\n코드를 복사해 앱에 붙여넣어 주세요.';
+      action.style.display = 'none';
       bar.classList.add('show');
       return;
     }
@@ -1387,9 +1453,25 @@
     deferredInstall.userChoice.then(function(){ deferredInstall = null; updateInstallBar(); });
   });
 
+  document.getElementById('installCopy').addEventListener('click', function(){
+    var code = window.sdPendingCode; if(!code) return;
+    function done(ok){ document.getElementById('installText').textContent = ok
+      ? '코드를 복사했어요.\n앱을 열고 "활성화 코드 입력"에 붙여넣어 주세요.'
+      : '복사가 안 됐어요.\n아래 코드를 길게 눌러 직접 복사해 주세요.'; }
+    function fallback(){
+      var box = document.getElementById('installCode'), ok = false;
+      try { box.removeAttribute('readonly'); box.focus(); box.setSelectionRange(0, 999999); ok = document.execCommand('copy'); }
+      catch(e){} finally { box.setAttribute('readonly', ''); }
+      done(ok);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(function(){ done(true); }, fallback);
+    else fallback();
+  });
+  window.sdUpdateInstallBar = updateInstallBar;
+
   document.getElementById('installClose').addEventListener('click', function(){
-    // 앱 안 브라우저 안내는 닫아도 다음에 또 뜬다. 거기선 설치가 아예 안 되니까.
-    if(!inAppBrowser()){ try { localStorage.setItem(INSTALL_HINT_KEY, 'off'); } catch(e){} }
+    // 앱 안 브라우저 안내와 코드 안내는 닫아도 다음에 또 뜬다
+    if(!inAppBrowser() && !window.sdPendingCode){ try { localStorage.setItem(INSTALL_HINT_KEY, 'off'); } catch(e){} }
     document.getElementById('installBar').classList.remove('show');
   });
 
@@ -1739,6 +1821,157 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) mpHoldAll
   }
   window.thRender=render;
   render();
+})();
+</script>
+<script>
+/* =========================================================
+   활성화(사용 기간) — 2026-11-25, 선생님 결정
+   감정일기(cbt-diary)와 같은 키쌍·같은 코드 형식. 코드 맨 앞 바이트로 앱을 나눈다:
+     1 = 감정일기, 2 = 수면일기  → 서로의 코드로는 열리지 않는다.
+   앱에는 공개키만 들어간다(공개키로는 코드를 만들 수 없다). 개인키는 절대 저장소에 넣지 않는다.
+   잠기면(코드 없음·만료·시계 되돌림) 기록·수면처방·생각바꾸기·마음챙김을 가리고, 추이(지난 기록·인쇄)만 연다.
+   ========================================================= */
+(function(){
+  var ACTIVATION_PUBLIC_KEY = {"kty":"EC","crv":"P-256","x":"jg0Lhuq-HXfXjDLPvm-N-IN6kz7w8Z1c8XQfGZjS8Ls","y":"RfqbKgx-Y-m_DV_HV5uHkJ73Ba47KTnFivFbeuL0nvg"};
+  var APP_BYTE = 2;
+  var LICENSE_KEY = 'sleepDiary.license.v1';
+  var SIGN_ALG = { name:'ECDSA', hash:'SHA-256' }, KEY_ALG = { name:'ECDSA', namedCurve:'P-256' };
+  var CODE_EPOCH = Date.UTC(2020, 0, 1);
+  var LOCK_VIEWS = ['input','hygiene','think','mind'];
+  // 개발용: 내 PC에서 파일로 열거나(file://) localhost로 열면 잠그지 않는다 (선생님 결정 2026-11-25).
+  // 잠금은 공개 주소(github.io)에서만. 파일을 받아 여는 사람은 어차피 코드를 뜯어볼 수 있어 보안이 더 약해지지 않는다
+  var DEV_HOST = location.protocol === 'file:' || ['localhost','127.0.0.1','[::1]'].indexOf(location.hostname) >= 0;
+  function pad(n){ return (n<10?'0':'')+n; }
+  function toast(m){ if(window.sdToast) sdToast(m); }
+
+  function b64urlToBytes(str){
+    var p = str.replace(/-/g,'+').replace(/_/g,'/');
+    var bin = atob(p + '==='.slice((p.length + 3) % 4)), out = new Uint8Array(bin.length);
+    for(var k=0;k<bin.length;k++) out[k] = bin.charCodeAt(k);
+    return out;
+  }
+  // 본문 5바이트: [0] 앱(2) | [1..2] 만료일(2020-01-01부터 며칠째) | [3..4] 일련번호
+  function unpack(b){
+    if(b.length !== 5 || b[0] !== APP_BYTE) return null;
+    var d = new Date(CODE_EPOCH + (((b[1] << 8) | b[2]) * 86400000));
+    return { exp: d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate()), sn: String((b[3] << 8) | b[4]) };
+  }
+  // 서명이 맞으면 {exp, sn}, 아니면 null
+  function verifyCode(code){
+    var str = String(code).replace(/\s+/g,'');
+    var all; try { all = b64urlToBytes(str); } catch(e){ return Promise.resolve(null); }
+    if(!str || all.length !== 69 || !window.crypto || !crypto.subtle) return Promise.resolve(null);
+    var payload = all.slice(0,5), sig = all.slice(5), info = unpack(payload);
+    if(!info) return Promise.resolve(null);
+    return crypto.subtle.importKey('jwk', ACTIVATION_PUBLIC_KEY, KEY_ALG, false, ['verify'])
+      .then(function(key){ return crypto.subtle.verify(SIGN_ALG, key, sig, payload); })
+      .then(function(ok){ return ok ? info : null; }, function(){ return null; });
+  }
+  function load(){ try { return JSON.parse(localStorage.getItem(LICENSE_KEY)); } catch(e){ return null; } }
+  function store(code, res){
+    var now = new Date().toISOString();
+    try { localStorage.setItem(LICENSE_KEY, JSON.stringify({ code:code, exp:res.exp, sn:res.sn, activatedAt:now, lastSeen:now })); } catch(e){}
+  }
+  // 저장해 둔 만료일로 먼저 판단하고, 서명은 뒤에서 다시 확인한다
+  function state(){
+    if(DEV_HOST) return { state:'dev' };
+    var rec = load();
+    if(!rec || !rec.exp) return { state:'none' };
+    var now = new Date();
+    if(rec.lastSeen && now.getTime() < new Date(rec.lastSeen).getTime() - 86400000) return { state:'clock', exp:rec.exp };  // 시계를 되돌려 기간을 늘리는 것을 막는다
+    if(now > new Date(rec.exp + 'T23:59:59')) return { state:'expired', exp:rec.exp };
+    return { state:'active', exp:rec.exp, sn:rec.sn };
+  }
+  function touch(){
+    var rec = load(); if(!rec) return; var now = new Date();
+    if(!rec.lastSeen || now > new Date(rec.lastSeen)){ rec.lastSeen = now.toISOString(); try { localStorage.setItem(LICENSE_KEY, JSON.stringify(rec)); } catch(e){} }
+  }
+  function fmt(d){ return (+d.slice(0,4))+'년 '+(+d.slice(5,7))+'월 '+(+d.slice(8,10))+'일'; }
+
+  // 잠금 안내 카드를 잠그는 탭마다 하나씩
+  LOCK_VIEWS.forEach(function(v){
+    var view = document.getElementById('view-'+v); if(!view) return;
+    var box = document.createElement('div'); box.className = 'lock-view';
+    box.innerHTML = '<p></p><button type="button">활성화 코드 입력</button>';
+    box.querySelector('button').addEventListener('click', openSheet);
+    view.insertBefore(box, view.firstChild);
+  });
+  // 추이 탭 아래쪽에 남은 기간
+  var printBtn = document.getElementById('r-print');
+  var row = document.createElement('div'); row.className = 'lic-row'; row.id = 'licRow';
+  printBtn.parentNode.insertBefore(row, printBtn);
+
+  function apply(msg, ok){
+    var st = state(), locked = st.state !== 'active' && st.state !== 'dev';
+    document.body.classList.toggle('locked', locked);
+    var text = msg || (st.state === 'expired'
+      ? '사용 기간이 ' + fmt(st.exp) + '에 끝났어요.\n지난 기록은 「추이」에서 그대로 보실 수 있어요.'
+      : st.state === 'clock'
+        ? '기기 시간이 맞지 않아요.\n시간을 바로잡거나 코드를 다시 입력해 주세요.'
+        : '센터에서 받은 활성화 코드를 입력하면\n쓰기 시작할 수 있어요.');
+    document.querySelectorAll('.lock-view').forEach(function(b){
+      b.querySelector('p').textContent = text; b.classList.toggle('ok', !!ok);
+    });
+    if(ok){ document.body.classList.add('locked'); setTimeout(function(){ apply(); }, 3500); }
+    if(locked && window.mpHoldAll) mpHoldAll();
+    row.innerHTML = st.state === 'dev' ? '개발용(내 PC)으로 열려 있어 잠금이 꺼져 있어요. 공개 주소에서는 코드가 필요해요.'
+      : st.state === 'active'
+      ? '사용 기간 <b>' + fmt(st.exp) + '</b>까지<br><button type="button" id="licAgain">활성화 코드 다시 입력</button>'
+      : '<button type="button" id="licAgain">활성화 코드 입력</button>';
+    var again = document.getElementById('licAgain'); if(again) again.addEventListener('click', openSheet);
+  }
+
+  // 저장된 코드의 서명을 뒤에서 다시 확인한다. 만료일만 고쳐 넣은 기록은 여기서 걸린다
+  function recheck(){
+    var rec = load(); if(!rec || !rec.code) return;
+    verifyCode(rec.code).then(function(res){
+      if(!res || res.exp !== rec.exp){ try { localStorage.removeItem(LICENSE_KEY); } catch(e){} apply(); }
+      else touch();
+    });
+  }
+
+  var sheet = document.getElementById('actSheet'), input = document.getElementById('actInput'), amsg = document.getElementById('actMsg');
+  function openSheet(){ input.value = ''; amsg.textContent = ''; amsg.classList.remove('err'); sheet.classList.add('open'); }
+  function closeSheet(){ sheet.classList.remove('open'); }
+  document.getElementById('actCancel').addEventListener('click', closeSheet);
+  sheet.addEventListener('click', function(e){ if(e.target === sheet) closeSheet(); });
+  function err(m){ amsg.textContent = m; amsg.classList.add('err'); }
+  document.getElementById('actConfirm').addEventListener('click', function(){
+    var code = input.value.trim();
+    if(!code) return err('코드를 붙여넣어 주세요');
+    verifyCode(code).then(function(res){
+      if(!res) return err('올바른 코드가 아니에요');
+      if(new Date() > new Date(res.exp + 'T23:59:59')) return err('이미 ' + fmt(res.exp) + '에 만료된 코드예요');
+      store(code, res); closeSheet(); apply(); toast('활성화됐어요. ' + fmt(res.exp) + '까지 쓰실 수 있어요');
+    });
+  });
+
+  // 활성화 링크(주소 끝 #a=코드)로 열면 코드를 입력하지 않아도 된다. # 뒤는 서버로 가지 않는다
+  function inAppBrowser(){ return /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps/i.test(navigator.userAgent); }
+  function isStandalone(){ return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+  function fromLink(){
+    var m = location.hash.match(/^#a=([A-Za-z0-9\-_]+)$/); if(!m) return;
+    var code = m[1];
+    // 카톡 안에서는 여기서 활성화해도 홈 화면 앱이 못 본다. 주소도 그대로 둔다(크롬으로 넘길 때 코드가 붙어 있어야 한다)
+    if(inAppBrowser()){ window.sdPendingCode = code; if(window.sdUpdateInstallBar) sdUpdateInstallBar(); return; }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+    verifyCode(code).then(function(res){
+      if(!res) return apply('링크의 코드가 올바르지 않아요.\n센터에 다시 받아 주세요.');
+      if(new Date() > new Date(res.exp + 'T23:59:59')) return apply('이 링크는 ' + fmt(res.exp) + '에 만료됐어요.');
+      var cur = state();
+      if(cur.state === 'active' && cur.exp >= res.exp){ toast('이미 ' + fmt(cur.exp) + '까지 쓰실 수 있어요'); return; }  // 실수로 짧아지지 않게
+      store(code, res); apply('활성화됐어요.\n' + fmt(res.exp) + '까지 쓰실 수 있어요.', true);
+      // 아이폰은 사파리와 홈 화면 앱의 저장 공간이 따로다. 앱에도 넣을 수 있게 남긴다
+      if(/iPhone|iPad|iPod/.test(navigator.userAgent) && !isStandalone()){ window.sdPendingCode = code; if(window.sdUpdateInstallBar) sdUpdateInstallBar(); }
+    });
+  }
+  window.addEventListener('hashchange', fromLink);   // 앱이 열려 있을 때 링크를 눌러도
+
+  apply();
+  fromLink();
+  recheck();
+  // 열어 둔 채로 만료일이 지나도 잠기게
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ apply(); touch(); } });
 })();
 </script>
 </body>
